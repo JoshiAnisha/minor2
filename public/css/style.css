@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffffd9;
+    backdrop-filter: blur(5px);
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 150px;
+}
+
+.nav-hover:hover {
+    color: #0dcaf0 !important;
+    transition: 0.3s ease-in-out;
+}
+
+.logo-img {
+    max-height: 45px;
+}
+
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.hero-text {
+    animation: fadeInUp 0.8s ease-in-out;
+}
+
+.hero-img {
+    animation: zoomIn 0.8s ease-in-out;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 500px;
+    background-color: #ffffffd9;
+    backdrop-filter: blur(5px);
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 150px;
+}
+
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#auth-body {
+    background: url("../Images/background.jpeg") no-repeat center center fixed !important;
+    background-size: cover !important;
+}
+
+.chatbox {
+    width: 320px;
+    max-height: 350px;
+    z-index: 1055;
+}
+
+#chatBody {
+    height: 220px;
+}
