@@ -42,4 +42,5 @@
         <a class="nav-link" href="{{ route('Caregiver.edit') }}">My Profile</a>
         <a class="nav-link text-danger" href="{{ route('logout') }}">Logout</a>
       </nav>
+      {{-- test --}}
     </div>
