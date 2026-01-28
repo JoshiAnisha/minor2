@@ -48,7 +48,7 @@ class CaregiverController extends Controller
                                 ->count();
         $completedCount = $completedBookings;
 
-        return view('caregiver.dashboard', compact(
+        return view('Caregiver.dashboard', compact(
             'upcomingVisits',
             'tasksToLog',
             'completedBookings',

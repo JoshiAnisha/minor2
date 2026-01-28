@@ -1,4 +1,4 @@
-@extends('caregiver.layouts.app')
+@extends('Caregiver.layouts.app')
 
 @section('content')
     <div class="container mt-4">

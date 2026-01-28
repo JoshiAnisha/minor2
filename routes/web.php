@@ -123,14 +123,6 @@ Route::post('/caregiver/reviews', [CaregiverBookingController::class, 'storeRevi
     Route::get('admin/appointments', [AppointmentController::class, 'index'])
      ->name('admin.appointment');
 
-
-Route::get('/', function () {
-    return view('index');
-})->name('index');
-
-Route::get('/chatbot', function () {
-    return view('chatbot');
-});
 Route::post('/api/chat', [ChatController::class, 'sendMessage'])
     ->name('chat.send');
 

@@ -1,4 +1,4 @@
-@extends('caregiver.layouts.app')
+@extends('Caregiver.layouts.app')
 
 @section('title', 'Edit Caregiver Profile')
 

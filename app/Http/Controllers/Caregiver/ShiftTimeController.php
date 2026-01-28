@@ -14,7 +14,7 @@ class ShiftTimeController extends Controller
      */
     public function index()
     {
-        return view('caregiver.shiftTime');
+        return view('Caregiver.shiftTime');
     }
 
     /**
