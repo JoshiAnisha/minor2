@@ -61,10 +61,10 @@ class AuthController extends Controller
                     return redirect()->route('patient.dashboard');
                 case 'caregiver':
                     // Add caregiver dashboard route when available
-                    return redirect()->route('patient.dashboard'); // Temporary
+                    return redirect()->route('caregiver.dashboard'); // Temporary
                 case 'admin':
                     // Add admin dashboard route when available
-                    return redirect()->route('patient.dashboard'); // Temporary
+                    return redirect()->route('admin.dashboard'); // Temporary
                 default:
                     return redirect()->route('patient.dashboard');
             }

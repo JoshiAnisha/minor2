@@ -38,10 +38,10 @@
     <nav class="nav flex-column">
         <a class="nav-link" href="{{ route('caregiver.dashboard') }}">Dashboard</a>
         <a class="nav-link" href="{{ route('caregiver.bookings') }}">My Bookings</a>
-        <a class="nav-link" href="{{ route('Caregiver.shiftTime') }}">My Schedule</a>
+        <a class="nav-link" href="{{ route('caregiver.shift-time.index') }}">My Schedule</a>
         <a class="nav-link" href="{{ route('Caregiver.serviceRequest') }}">My Services</a>
         <a class="nav-link" href="{{ route('Caregiver.edit') }}">My Profile</a>
-        <a class="nav-link text-danger" href="{{ route('logout') }}">Logout</a>
+        {{-- <a class="nav-link text-danger" href="{{ route('logout') }}">Logout</a> --}}
     </nav>
     {{-- test --}}
 </div>

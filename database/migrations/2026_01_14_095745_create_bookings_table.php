@@ -12,22 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bookings', function (Blueprint $table) {
-            $table->id();
+    $table->id();
 
-            // The patient making the booking (logged-in user)
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->foreignId('patients_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('caregivers_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('services_id')->constrained()->cascadeOnDelete();
 
-            // The service being booked
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
+    $table->dateTime('date_time')->nullable();
+    $table->enum('status', ['pending', 'accepted', 'completed', 'cancelled']);
+    $table->text('location');
+    $table->decimal('price', 10, 2)->nullable();
+    $table->enum('duration_type', ['one-time', 'weekly', 'monthly'])->default('one-time');
+    $table->date('start_date');
+    $table->date('end_date');
+    $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
+    $table->timestamps();
+});
 
-            // Simple booking date (used in views)
-            $table->date('date');
-
-            // Booking status used across the UI
-            $table->enum('status', ['upcoming', 'completed', 'cancelled'])->default('upcoming');
-
-            $table->timestamps();
-        });
     }
 
     /**

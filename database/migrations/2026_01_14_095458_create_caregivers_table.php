@@ -29,6 +29,7 @@ return new class extends Migration
         $table->text('bio')->nullable();
         $table->string('certificate_path')->nullable();
         $table->timestamps();
+        $table->foreignId('users_id')->constrained()->on('users')->onDelete('cascade');
         
        });
 

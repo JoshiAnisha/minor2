@@ -8,19 +8,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\CaregiverShiftTime;
 
 class ShiftTimeController extends Controller
-{
-    /**
-     * Show shift-time form
-     */
+ {
     public function index()
     {
         return view('Caregiver.shiftTime');
     }
 
-    /**
-     * Store caregiver availability
-     */
-    public function store(Request $request)
+     public function store(Request $request)
     {
         $request->validate([
             'shift' => 'required|in:Day,Night,Both',
@@ -32,13 +26,13 @@ class ShiftTimeController extends Controller
         ]);
 
         CaregiverShiftTime::create([
-            'caregiver_id'   => Auth::id(),
-            'shift'           => $request->shift,
-            'start_time'      => $request->start_time,
-            'end_time'        => $request->end_time,
-            'day'             => $request->day,
-            'service'         => $request->service,
-            'available_date'  => $request->available_date,
+            'caregiver_id' => Auth::id(),
+            'shift' => $request->shift,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'day' => $request->day,
+            'service' => $request->service,
+            'available_date' => $request->available_date,
         ]);
 
         return back()->with('success', 'Availability saved successfully!');

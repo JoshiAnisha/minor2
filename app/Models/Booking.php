@@ -11,10 +11,18 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'service_id',
-        'date',
+        'service_request_id',
+        'patients_id',
+        'caregivers_id',
+        'services_id',
         'status',
+        'price',
+        'location',
+        'date_time',
+        'duration_type',
+        'start_date',
+        'end_date',
+        'payment_status',
     ];
 
     protected $casts = [
@@ -30,13 +38,25 @@ class Booking extends Model
         });
     }
 
-    public function user()
+     // Patient relationship (go through patients table to user)
+    public function patient()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Patient::class, 'patients_id');
+    }
+
+    // Caregiver relationship (optional, if you want the name)
+    public function caregiver()
+    {
+        return $this->belongsTo(Caregiver::class, 'caregivers_id');
     }
 
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Service::class, 'services_id');
     }
-}
+
+    public function serviceRequest()
+    {
+        return $this->belongsTo(ServiceRequest::class, 'service_request_id');
+    }
+ }

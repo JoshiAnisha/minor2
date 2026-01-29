@@ -14,7 +14,7 @@ use App\Http\Controllers\Caregiver\CaregiverController;
 use App\Http\Controllers\Caregiver\ShiftTimeController;
 use App\Http\Controllers\Caregiver\ServiceRequestController;
 use App\Http\Controllers\Caregiver\CaregiverBookingController;
-use App\Http\Controllers\Admin\PatientController as AdminPatientController;
+use App\Http\Controllers\Admin\PatientController as AdminPatientController; 
 use App\Http\Controllers\Admin\CaregiverController as AdminCaregiverController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\AppointmentController;
@@ -119,6 +119,16 @@ Route::get('/caregiver/reviews/create/{patient}', [CaregiverBookingController::c
 Route::post('/caregiver/reviews', [CaregiverBookingController::class, 'storeReview'])
     ->middleware('auth')
     ->name('caregiver.reviews.store');
+
+
+    
+Route::middleware(['auth'])->prefix('caregiver')->name('caregiver.')->group(function () {
+    Route::get('/shift-time', [ShiftTimeController::class, 'index'])
+        ->name('shift-time.index');
+
+    Route::post('/shift-time', [ShiftTimeController::class, 'store'])
+        ->name('shift-time.store');
+});
 
     Route::get('admin/appointments', [AppointmentController::class, 'index'])
      ->name('admin.appointment');

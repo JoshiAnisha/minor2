@@ -33,7 +33,8 @@
                 <p><strong>Email:</strong> {{ $user->email }}</p>
                 <p><strong>Phone:</strong> {{ $patient->contact_number ?? '-' }}</p>
                 <p><strong>Date of Birth:</strong>
-                    {{ $patient->date_of_birth ? $patient->date_of_birth->format('Y-m-d') : '-' }}</p>
+                    {{ optional($patient?->date_of_birth)->format('Y-m-d') ?? '-' }}
+                </p>
                 <p><strong>Gender:</strong> {{ $patient->gender ?? '-' }}</p>
                 <p><strong>Blood Group:</strong> {{ $patient->blood_group ?? '-' }}</p>
                 <p><strong>Address:</strong> {{ $patient->address ?? '-' }}</p>
