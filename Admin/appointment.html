@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments Management | SewaCare</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      color: #1e293b;
+    }
+
+    /* SPACE RESERVED FOR SIDEBAR */
+    .main-wrapper {
+      margin-left: 260px; 
+      padding: 2.5rem;
+    }
+
+    /* Stats Cards */
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      height: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .icon-square {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Table Styling */
+    .table-container {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    /* Hover Effect */
+    .table.table-hover tbody tr:hover {
+      background-color: #f1f5f9; 
+      transition: background-color 0.2s ease;
+    }
+
+    .table thead th {
+      background-color: #f8fafc;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      border: none;
+      padding: 1rem;
+    }
+
+    .table tbody td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      transition: 0.2s;
+    }
+
+    .btn-edit { background: #eff6ff; color: #2563eb; border: none; }
+    .btn-edit:hover { background: #2563eb; color: white; }
+
+    .btn-delete { background: #fef2f2; color: #dc2626; border: none; }
+    .btn-delete:hover { background: #dc2626; color: white; }
+
+    .service-tag {
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .form-select-sm {
+      border-radius: 8px;
+      border-color: #e2e8f0;
+    }
+
+    @media (max-width: 992px) {
+      .main-wrapper { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="main-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold m-0">Appointments Management</h2>
+      <div class="text-muted small">Real-time Booking Control</div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="icon-square" style="background: #e0f2fe; color: #0ea5e9;"><i class="bi bi-calendar-check"></i></div>
+          <div class="stat-label">Total Appointments</div>
+          <h3 class="fw-bold mt-1 mb-0">56</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="icon-square" style="background: #fef3c7; color: #d97706;"><i class="bi bi-clock-history"></i></div>
+          <div class="stat-label">Pending Approval</div>
+          <h3 class="fw-bold mt-1 mb-0">14</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="icon-square" style="background: #dcfce7; color: #16a34a;"><i class="bi bi-check2-circle"></i></div>
+          <div class="stat-label">Completed Sessions</div>
+          <h3 class="fw-bold mt-1 mb-0">30</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold m-0">All Care Requests</h5>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>SN</th>
+              <th>Patient</th>
+              <th>Service</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th style="min-width: 150px;">Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="text-muted fw-bold">01</span></td>
+              <td class="fw-semibold">Sita Ram</td>
+              <td><span class="service-tag">Physiotherapy</span></td>
+              <td>2025-06-25</td>
+              <td>10:00 AM</td>
+              <td>
+                <select class="form-select form-select-sm">
+                  <option>Pending</option>
+                  <option selected>Confirmed</option>
+                  <option>In Process</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                </select>
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                  <a href="#" class="btn-action btn-edit">Edit</a>
+                  <a href="#" class="btn-action btn-delete" onclick="return confirm('Delete this appointment?')">Delete</a>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td><span class="text-muted fw-bold">02</span></td>
+              <td class="fw-semibold">Gita Sharma</td>
+              <td><span class="service-tag">Home Nursing</span></td>
+              <td>2025-06-26</td>
+              <td>02:00 PM</td>
+              <td>
+                <select class="form-select form-select-sm">
+                  <option selected>Pending</option>
+                  <option>Confirmed</option>
+                  <option>In Process</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                </select>
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                  <a href="#" class="btn-action btn-edit">Edit</a>
+                  <a href="#" class="btn-action btn-delete" onclick="return confirm('Delete this appointment?')">Delete</a>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td><span class="text-muted fw-bold">03</span></td>
+              <td class="fw-semibold">Hari KC</td>
+              <td><span class="service-tag">Lab Test</span></td>
+              <td>2025-06-27</td>
+              <td>09:30 AM</td>
+              <td>
+                <select class="form-select form-select-sm">
+                  <option>Pending</option>
+                  <option>Confirmed</option>
+                  <option selected>In Process</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                </select>
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                  <a href="#" class="btn-action btn-edit">Edit</a>
+                  <a href="#" class="btn-action btn-delete" onclick="return confirm('Delete this appointment?')">Delete</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

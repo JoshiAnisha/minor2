@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback - Admin | SewaCare</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      color: #1e293b;
+    }
+
+    /* SPACE RESERVED FOR SIDEBAR */
+    .main-wrapper {
+      margin-left: 260px; 
+      padding: 2.5rem;
+    }
+
+    /* Table Styling */
+    .table-container {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    /* Professional Hover Color */
+    .table.table-hover tbody tr:hover {
+      background-color: #f1f5f9; 
+      transition: background-color 0.2s ease;
+    }
+
+    .table thead th {
+      background-color: #f8fafc;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      border: none;
+      padding: 1rem;
+    }
+
+    .table tbody td {
+      padding: 1.2rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+    }
+
+    /* Action Button */
+    .btn-delete { 
+      background: #fef2f2; 
+      color: #dc2626; 
+      border: none;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    
+    .btn-delete:hover { 
+      background: #dc2626; 
+      color: white; 
+    }
+
+    .feedback-text {
+      color: #475569;
+      font-style: italic;
+      max-width: 400px;
+    }
+
+    @media (max-width: 992px) {
+      .main-wrapper { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="main-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold m-0">Patient Feedback</h2>
+        <p class="text-muted small mb-0">Reviews and service ratings from patients</p>
+      </div>
+    </div>
+
+    <div class="table-container shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>SN</th>
+              <th>Patient</th>
+              <th>Caregiver</th>
+              <th>Feedback</th>
+              <th>Date</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="text-muted fw-bold">01</span></td>
+              <td class="fw-semibold text-dark">Bhawana Joshi</td>
+              <td class="text-primary fw-medium">Sita Rai</td>
+              <td><div class="feedback-text">"Very caring and professional nurse!"</div></td>
+              <td>2025-07-11</td>
+              <td class="text-end">
+                <button type="button" class="btn-delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="text-muted fw-bold">02</span></td>
+              <td class="fw-semibold text-dark">Ramesh Khadka</td>
+              <td class="text-primary fw-medium">Hari KC</td>
+              <td><div class="feedback-text">"Arrived late for appointment. Please improve punctuality."</div></td>
+              <td>2025-07-10</td>
+              <td class="text-end">
+                <button type="button" class="btn-delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="text-muted fw-bold">03</span></td>
+              <td class="fw-semibold text-dark">Alisha Sharma</td>
+              <td class="text-primary fw-medium">Rita Thapa</td>
+              <td><div class="feedback-text">"Great therapy sessions. Helped me recover quickly."</div></td>
+              <td>2025-07-09</td>
+              <td class="text-end">
+                <button type="button" class="btn-delete">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

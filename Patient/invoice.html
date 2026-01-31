@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service Details - SewaCare</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-cyan: #0dcaf0;
+      --soft-bg: #f8fbff;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--soft-bg);
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    /* Main Content Wrapper - Aligns with Sidebar */
+    .main-content {
+      margin-left: 260px; /* Matches your sidebar width */
+      padding: 3rem;
+    }
+
+    /* Header Styling */
+    .page-title {
+      font-weight: 700;
+      color: var(--primary-cyan);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Summary Card Styling */
+    .summary-box {
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      border-left: 5px solid var(--primary-cyan);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(13, 202, 240, 0.05);
+    }
+
+    /* Premium Table Container */
+    .table-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    /* Clean Table Styling */
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table thead th {
+      background-color: transparent;
+      border-bottom: 2px solid #f1f5f9;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 1rem;
+    }
+
+    .table tbody td {
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    /* Styling Specific Columns */
+    .invoice-id {
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .amount-text {
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* Soft Status Badges */
+    .badge-soft {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-paid { background-color: #f0fdf4; color: #166534; }
+    .status-unpaid { background-color: #fffbeb; color: #b45309; }
+
+    /* Action Buttons */
+    .btn-action-primary {
+      background-color: var(--primary-cyan);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-action-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(13, 202, 240, 0.3);
+      color: white;
+    }
+
+    .btn-action-secondary {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-action-secondary:hover {
+      border-color: var(--primary-cyan);
+      color: var(--primary-cyan);
+      background-color: #f0f9ff;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="main-content">
+  
+  <div class="mb-4">
+    <h3 class="page-title">My Invoices</h3>
+    <p class="text-muted">View and download your past payment records.</p>
+  </div>
+
+  <div class="summary-box">
+    <h6 class="mb-0 text-dark">
+      <i class="bi bi-info-circle-fill text-info me-2"></i>
+      You have <strong>2 unpaid invoices</strong> and <strong>4 paid</strong> records.
+    </h6>
+  </div>
+
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Caregiver</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="invoice-id">#INV001</td>
+            <td class="fw-bold">Home Nursing</td>
+            <td>2025-07-01</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-person-circle text-muted"></i> Rita Thapa
+              </div>
+            </td>
+            <td class="amount-text">Rs. 1,500</td>
+            <td><span class="badge-soft status-paid">Paid</span></td>
+            <td><a href="#" class="btn-action-secondary"><i class="bi bi-download me-1"></i> Download</a></td>
+          </tr>
+
+          <tr>
+            <td class="invoice-id">#INV002</td>
+            <td class="fw-bold">Physiotherapy</td>
+            <td>2025-07-03</td>
+            <td>
+               <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-person-circle text-muted"></i> Sunil Gurung
+              </div>
+            </td>
+            <td class="amount-text">Rs. 1,200</td>
+            <td><span class="badge-soft status-unpaid">Unpaid</span></td>
+            <td><a href="#" class="btn-action-primary">Pay Now</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

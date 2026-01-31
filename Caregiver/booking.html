@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - SewaCare</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-cyan: #0dcaf0;
+      --soft-bg: #f8fbff;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--soft-bg);
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .main-content {
+      margin-left: 280px; 
+      padding: 3.5rem;
+    }
+
+    .page-header-card {
+      background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+      padding: 2rem;
+      border-radius: 24px;
+      border: 1px solid rgba(13, 202, 240, 0.1);
+      margin-bottom: 2.5rem;
+    }
+
+    .page-header-card h3 {
+      color: var(--primary-cyan);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .table-container {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .table thead th {
+      background-color: transparent;
+      border-bottom: 2px solid #f1f5f9;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 1.25rem 1rem;
+    }
+
+    .table tbody td {
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-soft {
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+
+    .bg-soft-warning { background-color: #fffbeb; color: #b45309; }
+    .bg-soft-success { background-color: #f0fdf4; color: #166534; }
+    .bg-soft-info { background-color: #eff6ff; color: #1d4ed8; }
+  </style>
+</head>
+<body>
+
+<div class="main-content">
+    <div class="page-header-card">
+        <h3>My Bookings</h3>
+        <p class="text-muted mb-0">Track and manage your scheduled home healthcare visits.</p>
+    </div>
+
+    <h5 class="section-title">Recent Appointments</h5>
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Patient Name</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-muted">01</td>
+                        <td class="fw-bold">Sita Ram</td>
+                        <td>Home Nursing</td>
+                        <td>Jun 24, 2025</td>
+                        <td>10:00 AM</td>
+                        <td><span class="badge-soft bg-soft-warning">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">02</td>
+                        <td class="fw-bold">Gita Sharma</td>
+                        <td>Physiotherapy</td>
+                        <td>Jun 24, 2025</td>
+                        <td>02:00 PM</td>
+                        <td><span class="badge-soft bg-soft-success">Confirmed</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">03</td>
+                        <td class="fw-bold">Hari KC</td>
+                        <td>Lab Test</td>
+                        <td>Jun 25, 2025</td>
+                        <td>09:30 AM</td>
+                        <td><span class="badge-soft bg-soft-info">In Process</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

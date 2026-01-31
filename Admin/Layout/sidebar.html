@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SewaCare Admin | Sidebar</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-soft: #f8fafc;
+      --sidebar-bg: #ffffff;
+      --stone-200: #e2e8f0;
+      --stone-400: #94a3b8;
+      --accent-green: #16a34a;
+      --accent-blue: #2563eb;
+      --accent-orange: #d97706;
+      --shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-soft);
+      margin: 0;
+      color: #0f172a;
+    }
+
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
+      background-color: var(--bg-soft);
+    }
+
+    .sidebar {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--stone-200);
+      min-height: 100vh;
+      padding: 1.8rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .brand img {
+      max-width: 140px;
+    }
+
+    .brand-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #0ea5e9;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .user-card {
+      border: 1px solid var(--stone-200);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 1.5rem;
+      background: #fbfdff;
+    }
+
+    .user-card strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .user-status {
+      font-size: 0.8rem;
+      color: var(--stone-400);
+    }
+
+    .user-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--stone-400);
+    }
+
+    .user-stats span {
+      font-weight: 700;
+      color: #0f172a;
+      display: block;
+      font-size: 1rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--stone-400);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 1rem 0 0.6rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.85rem 0.9rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: 500;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-link i {
+      font-size: 1.15rem;
+      color: var(--stone-400);
+    }
+
+    .nav-link:hover {
+      background: #eff6ff;
+      color: var(--accent-blue);
+    }
+
+    .nav-link:hover i,
+    .nav-link.active i {
+      color: var(--accent-blue);
+    }
+
+    .nav-link.active {
+      background: #dbeafe;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .nav-link .badge {
+      margin-left: auto;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .logout-link {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.85rem 0.9rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #dc2626;
+      font-weight: 600;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+
+    .logout-link:hover {
+      background: #fee2e2;
+    }
+
+    .main-content {
+      margin-left: 260px;
+      flex-grow: 1;
+      background: transparent;
+    }
+
+    .top-header {
+      background: #ffffff;
+      height: 80px;
+      padding: 0 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--stone-200);
+      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.2);
+    }
+
+    .page-title {
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .badge-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-green);
+      background: #dcfce7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-container">
+  
+  <aside class="sidebar">
+    <div class="brand">
+      <a href="../admin.html">
+        <img src="../../Images/logo.png" alt="SewaCare logo" class="img-fluid">
+      </a>
+      <span class="brand-pill">Admin</span>
+    </div>
+
+    <div class="user-card">
+      <strong>Administrator</strong>
+    </div>
+
+    <p class="section-label">Overview</p>
+    <nav class="nav flex-column">
+      <a class="nav-link " href="../admin.html">
+        <i class="bi bi-columns-gap"></i>
+        Dashboard
+      </a>
+      <a class="nav-link" href="../appointment.html">
+        <i class="bi bi-clock-history"></i>
+        Appointments
+        <span class="badge" style="color: var(--accent-orange);">08</span>
+      </a>
+      <a class="nav-link" href="../patient.html">
+        <i class="bi bi-person-heart"></i>
+        Patients
+        <span class="badge" style="color: var(--accent-green);">76</span>
+      </a>
+
+      <p class="section-label" style="margin-top:1.3rem;">People</p>
+      <a class="nav-link" href="../caregiver.html">
+        <i class="bi bi-shield-plus"></i>
+        Caregivers
+        <span class="badge" style="color: var(--accent-blue);">24</span>
+      </a>
+      <a class="nav-link" href="../feedback.html">
+        <i class="bi bi-chat-left-dots"></i>
+        Feedback
+      </a>
+    </nav>
+
+    <a class="logout-link" href="../../logout.html">
+      <i class="bi bi-power"></i>
+      Logout
+    </a>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-header">
+      <h4 class="page-title mb-0">Management Overview</h4>
+      <div class="d-flex align-items-center gap-3">
+        <div class="text-end">
+          <div class="small fw-bold">Administrator</div>
+          <div class="text-muted" style="font-size: 0.75rem;">Active Session</div>
+        </div>
+        <span class="badge-pill">secure</span>
+      </div>
+    </header>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

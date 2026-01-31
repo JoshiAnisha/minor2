@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SewaCare FAQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-cyan: #0dcaf0;
+      --primary-cyan-soft: rgba(13, 202, 240, 0.1);
+      --deep-blue: #0a2540;
+      --text-grey: #64748b;
+      --bg-gradient: linear-gradient(135deg, #f8fbff 0%, #eef2f6 100%);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      color: var(--deep-blue);
+    }
+
+    /* FAQ Section Styling */
+    #faq {
+      padding: 5rem 0;
+    }
+
+    .faq-title {
+      font-weight: 800;
+      font-size: 2.75rem;
+      letter-spacing: -1px;
+      color: var(--deep-blue);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Modern Accordion Container */
+    .accordion {
+      --bs-accordion-btn-focus-box-shadow: none;
+      --bs-accordion-bg: transparent;
+    }
+
+    .accordion-item {
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 16px !important;
+      margin-bottom: 1.25rem;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(10, 37, 64, 0.03);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+    }
+
+    /* Hover & Active States */
+    .accordion-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(10, 37, 64, 0.08);
+      border-color: rgba(13, 202, 240, 0.3);
+    }
+
+    /* The Button (Question) */
+    .accordion-button {
+      padding: 1.75rem 2rem;
+      font-weight: 700;
+      color: var(--deep-blue);
+      font-size: 1.15rem;
+      background-color: transparent !important;
+      box-shadow: none !important;
+      border-radius: 16px !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+      color: var(--deep-blue); /* Keep text dark even when open for readability */
+      background-color: transparent !important;
+      padding-bottom: 1rem; /* Reduce padding slightly when open */
+    }
+
+    /* Custom Arrow Icon */
+    .accordion-button::after {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230a2540'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+      transition: transform 0.3s ease;
+      background-size: 1rem;
+    }
+
+    .accordion-button:not(.collapsed)::after {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230dcaf0'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+      transform: rotate(-180deg);
+    }
+
+    /* The Content (Answer) */
+    .accordion-body {
+      padding: 0 2rem 2rem 5.5rem; /* Indent text to align with title text, not icon */
+      color: var(--text-grey);
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    /* Icon Styling */
+    .faq-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-cyan-soft);
+      color: var(--primary-cyan);
+      margin-right: 1rem;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    /* Icon changes color on hover/active */
+    .accordion-item:hover .faq-icon,
+    .accordion-button:not(.collapsed) .faq-icon {
+      background-color: var(--primary-cyan);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<section id="faq">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      <p class="text-muted fs-5">Everything you need to know about SewaCare services.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8"> <div class="accordion" id="faqAccordion">
+          
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq1">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                <i class="bi bi-patch-question faq-icon"></i> How do I book a service?
+              </button>
+            </h2>
+            <div id="faqCollapse1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Just click on <strong class="text-dark">"Book"</strong> and fill out your details in the form. Our system matches you with the best available caregiver, and we'll handle the rest of the scheduling for you!
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq2">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                <i class="bi bi-shield-check faq-icon"></i> Are your caregivers certified?
+              </button>
+            </h2>
+            <div id="faqCollapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Absolutely. Every caregiver on SewaCare undergoes a rigorous background check, professional certification verification, and mandatory safety training to ensure the highest quality of home care.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                <i class="bi bi-wallet2 faq-icon"></i> What are the payment options?
+              </button>
+            </h2>
+            <div id="faqCollapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                We support all major credit cards, digital wallets, and bank transfers. Payments are only processed once your booking is confirmed by a caregiver.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

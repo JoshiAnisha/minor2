@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Appointments - SewaCare</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-cyan: #0dcaf0;
+      --soft-bg: #f8fbff;
+      --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--soft-bg);
+      color: #334155;
+    }
+
+    /* Content Header Styling */
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .text-info {
+      color: var(--primary-cyan) !important;
+      font-weight: 700;
+    }
+
+    /* Modern Table Container */
+    .table-container {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    /* Table Styling Overhaul */
+    .table {
+      margin-bottom: 0;
+      border: none !important;
+    }
+
+    /* Remove default borders */
+    .table>:not(caption)>*>* {
+      border-bottom: 1px solid #f1f5f9;
+      padding: 1.25rem 1rem;
+    }
+
+    .table thead th {
+      background-color: transparent;
+      border-bottom: 2px solid #f1f5f9 !important;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    /* Service Column Styling */
+    .service-name {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 1rem;
+    }
+
+    /* Caregiver Avatar Style */
+    .caregiver-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .caregiver-avatar {
+      width: 36px;
+      height: 36px;
+      background: #e0f7fa;
+      color: var(--primary-cyan);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    /* Soft Badge Styling (No more solid ugly colors) */
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-pending {
+      background-color: #fff7ed;
+      color: #c2410c;
+    }
+
+    .status-confirmed {
+      background-color: #f0fdf4;
+      color: #15803d;
+    }
+
+    /* Elegant Action Buttons */
+    .action-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .btn-reschedule {
+      background-color: #f0f9ff;
+      color: #0369a1;
+    }
+
+    .btn-reschedule:hover {
+      background-color: var(--primary-cyan);
+      color: white;
+    }
+
+    .btn-cancel {
+      background-color: #fff1f2;
+      color: #be123c;
+    }
+
+    .btn-cancel:hover {
+      background-color: #be123c;
+      color: white;
+    }
+
+    /* Main "Book" Button */
+    .btn-book {
+      background: linear-gradient(135deg, #0dcaf0, #007bff);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 14px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(13, 202, 240, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .btn-book:hover {
+      transform: translateY(-2px);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row min-vh-100">
+    <main class="col-md-11 col-lg-10 pt-5 px-5 mx-auto">
+      
+      <div class="page-header d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="text-info mb-1">My Appointments</h2>
+          <p class="text-muted">Welcome back, <strong>Bhawana</strong>! Manage your health visits.</p>
+        </div>
+        <a href="booking.html" class="btn btn-book">
+          <i class="bi bi-plus-lg me-2"></i>New Appointment
+        </a>
+      </div>
+
+      <div class="table-container">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Service Type</th>
+                <th>Date & Time</th>
+                <th>Caregiver</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="text-muted fw-bold">01</span></td>
+                <td>
+                  <div class="service-name">Home Nursing</div>
+                </td>
+                <td>
+                  <div class="fw-600 mb-0">2025-07-10</div>
+                  <small class="text-muted"><i class="bi bi-clock me-1"></i> 10:00 AM</small>
+                </td>
+                <td>
+                  <div class="caregiver-info">
+                    <div class="caregiver-avatar">RT</div>
+                    <span class="fw-600">Rita Thapa</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge status-pending">Pending</span>
+                </td>
+                <td>
+                  <div class="action-group justify-content-end">
+                    <a href="#" class="btn btn-action btn-reschedule">Reschedule</a>
+                    <a href="#" class="btn btn-action btn-cancel">Cancel</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td><span class="text-muted fw-bold">02</span></td>
+                <td>
+                  <div class="service-name">Physiotherapy</div>
+                </td>
+                <td>
+                  <div class="fw-600 mb-0">2025-07-12</div>
+                  <small class="text-muted"><i class="bi bi-clock me-1"></i> 02:00 PM</small>
+                </td>
+                <td>
+                  <div class="caregiver-info">
+                    <div class="caregiver-avatar">SG</div>
+                    <span class="fw-600">Sunil Gurung</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge status-confirmed">Confirmed</span>
+                </td>
+                <td>
+                  <div class="action-group justify-content-end">
+                    <a href="#" class="btn btn-action btn-reschedule">Reschedule</a>
+                    <a href="#" class="btn btn-action btn-cancel">Cancel</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
