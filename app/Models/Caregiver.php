@@ -10,32 +10,22 @@ class Caregiver extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'caregiver_type',
-        'qualification',
-        'experience',
-        'contact_number',
-        'skills',
-        'license_number',
-        'training_certificate',
-        'background_check_status',
-        'verified_status',
-        'rating',
-        'availability_status',
+         'user_id',
         'address',
+        'skills',
         'field',
         'bio',
-        'certificate_path'
-    ];
+        'certificate_path',
+        'preferred_shift',
+        'available_time',
+        'available_day',
+        'available_service',
+        'available_date',
+        'availability_status',
+ ];
 
-    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class, 'caregiver_id');
-    }
+     }
 }

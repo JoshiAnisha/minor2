@@ -42,9 +42,13 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('Caregiver.update') }}" method="POST" enctype="multipart/form-data">
+        {{-- Profile Update Form --}}
+        <form action="{{ route('caregiver.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            @method('PUT') {{-- Important for PUT request --}}
+
             <div class="row g-4">
+                {{-- Profile Photo --}}
                 <div class="col-md-4 text-center">
                     <input type="file" name="profile_photo" id="fileInput" accept="image/*" style="display: none;" />
                     <label for="fileInput" class="profile-photo-box" title="Click to change photo">
@@ -56,6 +60,7 @@
                     <p class="text-muted small">{{ $caregiver->caregiver_type ?? 'Caregiver' }}</p>
                 </div>
 
+                {{-- Profile Fields --}}
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -143,6 +148,7 @@
                             <textarea class="form-control" name="bio" rows="3">{{ old('bio', $caregiver->bio ?? '') }}</textarea>
                         </div>
 
+                        {{-- Certificate Upload --}}
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Upload Certificate (PDF/Doc/Image)</label>
                             <input type="file" class="form-control" name="certificate"
@@ -170,6 +176,7 @@
                             @endif
                         </div>
 
+                        {{-- Availability Checkbox --}}
                         <div class="col-12 mb-3 form-check">
                             <input class="form-check-input" type="checkbox" name="availability_status" id="availability"
                                 value="1"
@@ -177,6 +184,7 @@
                             <label class="form-check-label" for="availability">Available for service</label>
                         </div>
 
+                        {{-- Submit Button --}}
                         <div class="text-center">
                             <button type="submit" class="btn btn-info px-4">Save Profile</button>
                         </div>
@@ -185,4 +193,15 @@
             </div>
         </form>
     </div>
+
+    {{-- Profile Photo Preview Script --}}
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('profilePreview').src = event.target.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+    </script>
 @endsection

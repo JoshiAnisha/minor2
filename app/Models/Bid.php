@@ -17,14 +17,12 @@ class Bid extends Model
         'status',
     ];
 
-    // Relationship to ServiceRequest
-    public function serviceRequest()
+     public function serviceRequest()
     {
         return $this->belongsTo(ServiceRequest::class, 'service_request_id');
     }
 
-    // Optional: Relationship to Caregiver
-    public function caregiver()
+     public function caregiver()
     {
         return $this->belongsTo(Caregiver::class, 'caregivers_id');
     }

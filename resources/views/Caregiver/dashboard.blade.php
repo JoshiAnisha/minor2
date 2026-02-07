@@ -41,16 +41,17 @@
                             <i class="bi bi-calendar-check fs-2"></i>
                             <h6 class="mt-2">My Bookings</h6>
                         </a>
+
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('caregiver.services') }}"
+                        <a href="{{ route('caregiver.service.requests') }}">
                             class="card shadow-sm p-3 text-center text-decoration-none">
                             <i class="bi bi-gear fs-2"></i>
                             <h6 class="mt-2">My Services</h6>
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('caregiver.profile') }}"
+                        <a href="{{ route('caregiver.profile.edit') }}">
                             class="card shadow-sm p-3 text-center text-decoration-none">
                             <i class="bi bi-person-circle fs-2"></i>
                             <h6 class="mt-2">Profile</h6>

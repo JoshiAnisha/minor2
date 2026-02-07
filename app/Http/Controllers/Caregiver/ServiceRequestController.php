@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Caregiver;
 
 use App\Http\Controllers\Controller;
 use App\Models\ServiceRequest;
-use App\Models\Bids;
+use App\Models\Bid;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +21,7 @@ class ServiceRequestController extends Controller
             ->latest()
             ->get();
 
-        return view('caregiver.serviceRequest', compact('requests'));
+        return view('Caregiver.serviceRequest', compact('requests'));
     }
 
     /**
@@ -82,7 +82,7 @@ class ServiceRequestController extends Controller
             return back()->with('error', 'Caregiver profile not found.');
         }
 
-        Bids::create([
+        Bid::create([
             'caregivers_id'      => $caregiver->id, // ✅ FIXED
             'service_request_id' => $request->service_request_id,
             'proposed_price'     => $request->proposed_price,

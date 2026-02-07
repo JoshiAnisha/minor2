@@ -8,7 +8,7 @@
                     <div class="card-body p-4">
                         <h3 class="text-center fw-bold mb-4">My Available Shift and Time</h3>
 
-                        <form id="availabilityForm" method="POST" action="{{ route('caregiver.shift-time.store') }}">
+                        <form id="availabilityForm" method="POST" action="{{ route('caregiver.shift.store') }}">
                             @csrf
 
                             {{-- Shift --}}

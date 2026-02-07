@@ -31,10 +31,6 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('patient.bookings.create') }}">Book</a>
-                    </li>
-
-                    <li class="nav-item">
                         <a class="btn btn-info text-white ms-lg-3" href="{{ route('backend.auth.login') }}">
                             Login
                         </a>
@@ -59,9 +55,8 @@
                     <p class="lead text-muted">
                         Bringing professional healthcare and warm support right to your doorstep.
                     </p>
-
-                    <a href="{{ route('patient.bookings.create') }}" class="btn btn-danger btn-lg">
-                        Book a Visit
+                    <a href="{{ route('patient.services.index') }}" class="btn btn-primary btn-lg mt-3">
+                        Explore Services
                     </a>
                 </div>
 

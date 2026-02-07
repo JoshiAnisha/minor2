@@ -58,7 +58,7 @@
             </div>
         @endif
 
-        <form action="{{ route('caregiver.reviews.store') }}" method="POST">
+        <form action="{{ route('caregiver.review.store') }}" method="POST">
             @csrf
             <input type="hidden" name="patient_id" value="{{ $patient->id }}">
 

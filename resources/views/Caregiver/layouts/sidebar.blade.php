@@ -34,14 +34,14 @@
         <a href="caregiver.html">
             <img src="{{ asset('images/logo.png') }}" alt="SewaCare Logo" class="img-fluid logo-img">
         </a>
-    </div>
-    <nav class="nav flex-column">
-        <a class="nav-link" href="{{ route('caregiver.dashboard') }}">Dashboard</a>
-        <a class="nav-link" href="{{ route('caregiver.bookings') }}">My Bookings</a>
-        <a class="nav-link" href="{{ route('caregiver.shift-time.index') }}">My Schedule</a>
-        <a class="nav-link" href="{{ route('Caregiver.serviceRequest') }}">My Services</a>
-        <a class="nav-link" href="{{ route('Caregiver.edit') }}">My Profile</a>
-        {{-- <a class="nav-link text-danger" href="{{ route('logout') }}">Logout</a> --}}
-    </nav>
-    {{-- test --}}
-</div>
+        <div class="sidebar">
+            <nav class="nav flex-column">
+                <a class="nav-link text-dark" href="{{ route('home') }}">Home</a>
+                <a class="nav-link" href="{{ route('caregiver.dashboard') }}">Dashboard</a>
+                <a class="nav-link" href="{{ route('caregiver.bookings') }}">My Bookings</a>
+                <a class="nav-link" href="{{ route('caregiver.shift.index') }}">My Schedule</a>
+                <a class="nav-link" href="{{ route('caregiver.service.requests') }}">My Services</a>
+                <a class="nav-link" href="{{ route('caregiver.profile.edit') }}">My Profile</a>
+                <a class="nav-link text-danger" href="{{ route('backend.auth.logout') }}">Logout</a>
+            </nav>
+        </div>

@@ -20,7 +20,7 @@ class FeedbackController extends Controller
         }
 
         // Fetch all reviews with reviewer information
-        $reviews = Reviews::with(['reviewer', 'caregiverProfile.user'])
+        $reviews = Review::with(['reviewer', 'caregiverProfile.user'])
             ->latest()
             ->get();
 

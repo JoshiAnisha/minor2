@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Caregiver;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Bids;
+use App\Models\Bid;
 use App\Models\Patient;
-use App\Models\Reviews;
+use App\Models\Review;
 use App\Models\ServiceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +18,7 @@ class CaregiverBookingController extends Controller
         $caregiverId = Auth::id();
 
         // Pending bids for this caregiver (only valid serviceRequests)
-        $pendingBids = Bids::with('serviceRequest.patient', 'serviceRequest.service')
+        $pendingBids = Bid::with('serviceRequest.patient', 'serviceRequest.service')
             ->where('caregivers_id', $caregiverId)
             ->where('status', 'pending')
             ->get()
@@ -44,7 +44,7 @@ class CaregiverBookingController extends Controller
             ->where('status', 'completed')
             ->get();
 
-        return view('caregiver.CaregiverBooking', compact(
+        return view('Caregiver.caregiverBooking', compact(
             'pendingBookings',
             'acceptedBookings',
             'completedBookings'
@@ -52,7 +52,7 @@ class CaregiverBookingController extends Controller
     }
 
     // Accept a bid and create booking
-    public function acceptBid(Bids $bid)
+    public function acceptBid(Bid $bid)
     {
         if (!$bid->serviceRequest) {
             return back()->with('error', 'This bid has no valid service request.');
@@ -155,7 +155,7 @@ class CaregiverBookingController extends Controller
 
         // Create review using only existing columns from migration
         // Note: bookings_id is constrained to caregivers table, so it stores caregiver ID
-        Reviews::create([
+        Review::create([
             'user_id' => $caregiverUserId, // Reviewer (caregiver's user_id from users table)
             'bookings_id' => $caregiver->id, // Caregiver ID (from caregivers table, per migration constraint)
             'rating' => $request->rating,

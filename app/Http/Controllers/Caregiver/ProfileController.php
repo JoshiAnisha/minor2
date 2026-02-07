@@ -10,38 +10,56 @@ use Illuminate\Support\Str;
 use App\Models\Caregiver;
 use App\Models\User;
 
+
 class ProfileController extends Controller
-{
-    // Show edit form (not changed)
+ {
     public function edit()
     {
         $user = Auth::user();
-        $caregiver = Caregiver::where('user_id', $user->id)->first();
-        return view('Caregiver.edit', compact('caregiver'));
-    }
+        if (!$user) {
+            abort(403, 'Unauthorized action.');
+        }
 
-    // Update caregiver profile
+        // ✅ FIXED: users_id
+        $caregiver = Caregiver::firstOrNew(['users_id' => $user->id]);
+
+        return view('Caregiver.edit', compact('user', 'caregiver'));
+    }
+ 
     public function update(Request $request)
     {
         $user = Auth::user();
+        if (!$user) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $request->validate([
-            'contact_number' => 'nullable|string|max:50',
+            'name' => 'required|string|max:100',
+            'email' => "required|email|unique:users,email,{$user->id}",
+            'contact_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
-            'skills' => 'nullable|string',
-            'field' => 'nullable|string|max:255',
+            'skills' => 'nullable|string|max:255',
+            'field' => 'nullable|string|max:100',
             'bio' => 'nullable|string',
-            'qualification' => 'nullable|string',
-            'experience' => 'nullable|string',
-            'caregiver_type' => 'nullable|in:medical,regular',
-            'certificate' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+            'qualification' => 'nullable|string|max:255',
+            'experience' => 'nullable|string|max:255',
+            'caregiver_type' => 'nullable|in:medical,regular,home_nurse',
+            'availability_status' => 'nullable|boolean',
+            'certificate' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // Correct column name: use user_id (not users_id)
-        $caregiver = Caregiver::firstOrNew(['user_id' => $user->id]);
+        // Update user
+        User::where('id', $user->id)->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'contact_number' => $request->contact_number,
+        ]);
+        
+        $user = Auth::user();
 
-        // Ensure association exists
-        $caregiver->user_id = $user->id;
+        // ✅ FIXED: users_id
+        $caregiver = Caregiver::firstOrNew(['users_id' => $user->id]);
 
         $caregiver->fill([
             'contact_number' => $request->contact_number,
@@ -55,22 +73,58 @@ class ProfileController extends Controller
             'availability_status' => $request->has('availability_status'),
         ]);
 
-        // Certificate upload (store in public disk)
-        if ($request->hasFile('certificate')) {
-            // delete previous file if present
+        // Certificate upload
+         if ($request->hasFile('certificate')) {
             if ($caregiver->certificate_path) {
                 Storage::disk('public')->delete($caregiver->certificate_path);
             }
 
-            $filename = (string) Str::uuid() . '.' . $request->file('certificate')->getClientOriginalExtension();
-            $path = $request->file('certificate')->storeAs('caregiver_certificates', $filename, 'public');
-            $caregiver->certificate_path = $path;
+            $filename = Str::uuid() . '.' . $request->file('certificate')->getClientOriginalExtension();
+            $caregiver->certificate_path =
+                $request->file('certificate')->storeAs('certificates', $filename, 'public');
+        }
+
+        // Profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            if ($caregiver->profile_photo_path) {
+                Storage::disk('public')->delete($caregiver->profile_photo_path);
+            }
+
+            $photoName = Str::uuid() . '.' . $request->file('profile_photo')->getClientOriginalExtension();
+            $caregiver->profile_photo_path =
+                $request->file('profile_photo')->storeAs('profile_photos', $photoName, 'public');
         }
 
         $caregiver->save();
 
-        return redirect()->back()->with('success', 'Profile updated successfully.');
+        return back()->with('success', 'Profile updated successfully!');
     }
 
-    // Other methods...
+    public function viewCertificate()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // ✅ FIXED: users_id
+        $caregiver = Caregiver::where('users_id', $user->id)->first();
+
+        if (
+            !$caregiver ||
+            !$caregiver->certificate_path ||
+            !Storage::disk('public')->exists($caregiver->certificate_path)
+        ) {
+            abort(404, 'Certificate not found.');
+        }
+
+        return response(
+            Storage::disk('public')->get($caregiver->certificate_path),
+            200,
+            [
+                'Content-Type' => mime_content_type(Storage::disk('public')->path($caregiver->certificate_path)),
+                'Content-Disposition' => 'inline',
+            ]
+        );
+    }
 }

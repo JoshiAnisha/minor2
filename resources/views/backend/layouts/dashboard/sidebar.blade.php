@@ -33,5 +33,6 @@
                 <i class="bi bi-person-circle me-2"></i> Profile
             </a>
         </li>
+        <a class="nav-link text-danger" href="{{ route('backend.auth.logout') }}">Logout</a>
     </ul>
 </div>

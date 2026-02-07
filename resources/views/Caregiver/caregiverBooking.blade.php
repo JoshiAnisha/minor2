@@ -136,7 +136,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>
                                         @if (!empty($booking->patients_id))
-                                            <a href="{{ route('caregiver.patients.show', $booking->patients_id) }}">
+                                            <a href="{{ route('caregiver.patient.show', $booking->patients_id) }}">
                                                 {{ optional($booking->patient->user)->name ?? 'N/A' }}
                                             </a>
                                         @else
@@ -159,7 +159,7 @@
                 {{-- Right: Leave Review Button --}}
                 <div class="col-md-4 d-flex align-items-center justify-content-center">
                     @if (!empty($booking->patients_id))
-                        <a href="{{ route('caregiver.reviews.create', $booking->patients_id) }}"
+                        <a href="{{ route('caregiver.review.create', $booking->patients_id) }}"
                             class="btn btn-primary btn-lg">
                             Leave Review
                         </a>

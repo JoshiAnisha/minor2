@@ -1,14 +1,22 @@
 @extends('backend.layouts.dashboard.app')
 
-@section('title', 'Booking Details')
-
 @section('content')
-    <h3 class="mb-4">Booking Details</h3>
+    <div class="container-fluid">
+        <h4>Booking Details</h4>
 
-    <div class="card p-4">
-        <p><strong>Service:</strong> {{ $booking->service->name }}</p>
-        <p><strong>Date:</strong> {{ $booking->date?->format('Y-m-d') }}</p>
-        <p><strong>Status:</strong> {{ ucfirst($booking->status) }}</p>
-        <p><strong>Created:</strong> {{ $booking->created_at->format('d M Y') }}</p>
+        <div class="card">
+            <div class="card-body">
+                <h2>{{ $booking->service->name }}</h2>
+                <p>Status: {{ $booking->status }}</p>
+                <p>Location: {{ $booking->location }}</p>
+                <p>Price: Rs {{ $booking->price }}</p>
+                <p>Start Date: {{ $booking->start_date }}</p>
+                <p>End Date: {{ $booking->end_date }}</p>
+                <p>Caregiver: {{ $booking->caregiver->name ?? 'Not assigned' }}</p>
+
+
+
+            </div>
+        </div>
     </div>
 @endsection
