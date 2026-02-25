@@ -57,4 +57,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Booking::class, 'user_id');
     }
+
+    public function assignedServicesAsPatient()
+    {
+        return $this->hasMany(AssignedService::class, 'patient_id');
+    }
+
+    public function assignedServicesAsAdmin()
+    {
+        return $this->hasMany(AssignedService::class, 'admin_id');
+    }
 }

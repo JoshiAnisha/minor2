@@ -45,7 +45,7 @@ class PatientController extends Controller
             'health_condition'
         ]));
 
-        return redirect()->route('admin.patient')
+        return redirect()->route('admin.patients.index')
             ->with('success', 'Patient updated successfully');
     }
 
@@ -53,7 +53,7 @@ class PatientController extends Controller
     {
         $patient->delete();
 
-        return redirect()->route('admin.patient')
+        return redirect()->route('admin.patients.index')
             ->with('success', 'Patient deleted successfully');
     }
 }

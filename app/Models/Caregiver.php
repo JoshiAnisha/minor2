@@ -10,7 +10,8 @@ class Caregiver extends Model
     use HasFactory;
 
     protected $fillable = [
-         'user_id',
+        'user_id',
+        'users_id',
         'address',
         'skills',
         'field',
@@ -27,5 +28,16 @@ class Caregiver extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-     }
+    }
+
+    public function rejectedServiceRequests()
+    {
+        return $this->belongsToMany(ServiceRequest::class, 'service_request_rejections', 'caregiver_id', 'service_request_id')
+            ->withTimestamps();
+    }
+
+    public function assignedServiceBids()
+    {
+        return $this->hasMany(AssignedServiceBid::class);
+    }
 }

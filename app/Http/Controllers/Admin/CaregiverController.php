@@ -45,7 +45,7 @@ class CaregiverController extends Controller
             'skills', 'field', 'address', 'bio'
         ]));
 
-        return redirect()->route('admin.caregiver')
+        return redirect()->route('admin.caregivers.index')
             ->with('success', 'Caregiver updated successfully');
     }
 
@@ -54,7 +54,7 @@ class CaregiverController extends Controller
     {
         $caregiver->delete();
 
-        return redirect()->route('admin.caregiver')
+        return redirect()->route('admin.caregivers.index')
             ->with('success', 'Caregiver deleted successfully');
     }
 

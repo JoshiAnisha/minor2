@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Backend\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Patient;
+use App\Models\Caregiver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -27,12 +29,24 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
             'password' => Hash::make($request->password),
         ]);
+
+        if ($request->role === 'patient') {
+            Patient::create([
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+        } elseif ($request->role === 'caregiver') {
+            Caregiver::create([
+                'user_id' => $user->id,
+                'users_id' => $user->id,
+            ]);
+        }
 
         return redirect()->route('backend.auth.login')->with('success', 'Registration successful! Please login.');
     }

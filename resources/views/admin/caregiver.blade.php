@@ -119,17 +119,18 @@
                                         </td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a href="{{ route('admin.caregiver.edit', $caregiver->id) }}"
+                                                <a href="{{ route('admin.caregivers.edit', $caregiver) }}"
                                                     class="btn btn-sm btn-info">Edit</a>
-                                                <form action="{{ route('admin.caregiver.status', $caregiver->id) }}"
-                                                    method="POST">
+                                                <form action="{{ route('admin.caregivers.toggle-status', $caregiver) }}"
+                                                    method="POST" class="d-inline">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button class="btn btn-sm btn-warning">
                                                         {{ $caregiver->availability_status ? 'Deactivate' : 'Activate' }}
                                                     </button>
                                                 </form>
-                                                <form action="{{ route('admin.caregiver.destroy', $caregiver->id) }}"
+                                                <form action="{{ route('admin.caregivers.destroy', $caregiver) }}"
+                                                    class="d-inline"
                                                     method="POST"
                                                     onsubmit="return confirm('Are you sure you want to delete this caregiver?')">
                                                     @csrf

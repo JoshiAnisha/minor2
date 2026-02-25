@@ -1,174 +1,104 @@
 @extends('Caregiver.layouts.app')
 
 @section('content')
-    <style>
-        .card {
-            border-left: 5px solid #0dcaf0;
-        }
+<style>
+    .section-title { font-weight: 700; margin-bottom: 1rem; }
+    .booking-card { border-radius: 16px; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+</style>
 
-        .badge {
-            font-size: 0.9rem;
-        }
-    </style>
+<div class="mb-4">
+    <h1 class="h3 fw-bold mb-1">My Bookings</h1>
+    <p class="text-muted mb-0">Manage your pending, active, and completed bookings</p>
+</div>
 
-    <div class="card shadow-sm p-4">
-        <h2 class="mb-4">My Bookings</h2>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
-        {{-- Pending Requests (Bids & Pending Service Requests) --}}
-        @forelse ($pendingBookings as $index => $item)
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Patient</th>
-                            <th>Service</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Location</th>
-                            <th>Price</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $isBid = $item instanceof \App\Models\Bids;
-                            $sr = $isBid ? $item->serviceRequest : $item;
-                        @endphp
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ optional($sr->patient)->name ?? 'N/A' }}</td>
-                            <td>{{ optional($sr->service)->name ?? 'N/A' }}</td>
-                            <td>{{ $sr->preferred_time ? \Carbon\Carbon::parse($sr->preferred_time)->format('Y-m-d') : '-' }}
-                            </td>
-                            <td>{{ $sr->preferred_time ? \Carbon\Carbon::parse($sr->preferred_time)->format('h:i A') : '-' }}
-                            </td>
-                            <td>{{ $sr->location ?? '-' }}</td>
-                            <td>Rs. {{ $isBid ? $item->proposed_price : $sr->service->base_price ?? 0 }}</td>
-                            <td>
-                                @if ($isBid)
-                                    <form action="{{ route('caregiver.bookings.acceptBid', $item->id) }}" method="POST">
-                                        @csrf
-                                        <button class="btn btn-sm btn-success">Accept</button>
-                                    </form>
-                                @else
-                                    <span class="badge bg-warning">Pending</span>
-                                @endif
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        @empty
-            <p class="text-muted">No pending requests.</p>
-        @endforelse
-
-        {{-- Accepted / In Progress --}}
-        <h5 class="mt-5 text-info">Accepted / In Progress</h5>
-        @forelse ($acceptedBookings as $index => $booking)
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover bg-light">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Patient</th>
-                            <th>Service</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ optional($booking->patient->user)->name ?? 'N/A' }}</td>
-                            <td>{{ optional($booking->service)->name ?? 'N/A' }}</td>
-                            <td>{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('Y-m-d') : '-' }}
-                            </td>
-                            <td>{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('h:i A') : '-' }}
-                            </td>
-                            <td>Rs. {{ $booking->price ?? 0 }}</td>
-                            <td><span class="badge bg-info">In Progress</span></td>
-                            <td>
-                                <form action="{{ route('caregiver.bookings.complete', $booking->booking_id) }}"
-                                    method="POST">
-                                    @csrf
-                                    <button class="btn btn-sm btn-success">Mark Completed</button>
-                                </form>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        @empty
-            <p class="text-muted">No accepted bookings.</p>
-        @endforelse
-
-        {{-- Completed --}}
-        <h5 class="mt-5 text-success">Completed Bookings</h5>
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-        @forelse ($completedBookings as $index => $booking)
-            <div class="row mb-4">
-                {{-- Left: Booking Details --}}
+{{-- Pending --}}
+<h5 class="section-title text-warning"><i class="bi bi-hourglass-split me-2"></i>Pending</h5>
+@forelse ($pendingBookings as $index => $item)
+    @php
+        $isBid = $item instanceof \App\Models\Bid;
+        $sr = $isBid ? $item->serviceRequest : $item;
+    @endphp
+    <div class="card booking-card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
                 <div class="col-md-8">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Patient</th>
-                                    <th>Service</th>
-                                    <th>Date</th>
-                                    <th>Time</th>
-                                    <th>Price</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>
-                                        @if (!empty($booking->patients_id))
-                                            <a href="{{ route('caregiver.patient.show', $booking->patients_id) }}">
-                                                {{ optional($booking->patient->user)->name ?? 'N/A' }}
-                                            </a>
-                                        @else
-                                            {{ optional($booking->patient->user)->name ?? 'N/A' }}
-                                        @endif
-                                    </td>
-                                    <td>{{ optional($booking->service)->name ?? 'N/A' }}</td>
-                                    <td>{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('Y-m-d') : '-' }}
-                                    </td>
-                                    <td>{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('h:i A') : '-' }}
-                                    </td>
-                                    <td>Rs. {{ $booking->price ?? 0 }}</td>
-                                    <td><span class="badge bg-success">Completed</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <strong>{{ optional($sr->user ?? $sr->patient?->user)->name ?? 'N/A' }}</strong> — {{ optional($sr->service)->name ?? 'N/A' }}
+                    <br>
+                    <small class="text-muted">{{ $sr->preferred_time ? \Carbon\Carbon::parse($sr->preferred_time)->format('d M Y, h:i A') : '-' }} · {{ $sr->location ?? '-' }}</small>
                 </div>
-
-                {{-- Right: Leave Review Button --}}
-                <div class="col-md-4 d-flex align-items-center justify-content-center">
-                    @if (!empty($booking->patients_id))
-                        <a href="{{ route('caregiver.review.create', $booking->patients_id) }}"
-                            class="btn btn-primary btn-lg">
-                            Leave Review
-                        </a>
+                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                    <span class="badge bg-secondary me-2">Rs {{ $isBid ? number_format($item->proposed_price, 0) : number_format($sr->service->base_price ?? 0, 0) }}</span>
+                    @if ($isBid)
+                        <span class="badge bg-warning text-dark">Awaiting patient</span>
+                    @else
+                        <a href="{{ route('caregiver.service.requests') }}" class="btn btn-sm btn-primary">Accept or Bid</a>
                     @endif
                 </div>
             </div>
-        @empty
-            <p class="text-muted">No completed bookings.</p>
-        @endforelse
-
+        </div>
     </div>
+@empty
+    <p class="text-muted">No pending requests.</p>
+@endforelse
+
+{{-- In Progress --}}
+<h5 class="section-title text-info mt-5"><i class="bi bi-arrow-repeat me-2"></i>In Progress</h5>
+@forelse ($acceptedBookings as $booking)
+    <div class="card booking-card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <strong>{{ optional($booking->patient->user)->name ?? 'N/A' }}</strong> — {{ optional($booking->service)->name ?? 'N/A' }}
+                    <br>
+                    <small class="text-muted">{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('d M Y, h:i A') : '-' }}</small>
+                </div>
+                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                    <span class="badge bg-info me-2">Rs {{ number_format($booking->price ?? 0, 0) }}</span>
+                    <form action="{{ route('caregiver.booking.complete', $booking->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-success">Mark Completed</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@empty
+    <p class="text-muted">No bookings in progress.</p>
+@endforelse
+
+{{-- Completed --}}
+<h5 class="section-title text-success mt-5"><i class="bi bi-check-circle me-2"></i>Completed</h5>
+@forelse ($completedBookings as $booking)
+    <div class="card booking-card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    @if (!empty($booking->patients_id))
+                        <a href="{{ route('caregiver.patient.show', $booking->patients_id) }}" class="text-decoration-none fw-semibold">{{ optional($booking->patient->user)->name ?? 'N/A' }}</a>
+                    @else
+                        <strong>{{ optional($booking->patient->user)->name ?? 'N/A' }}</strong>
+                    @endif
+                    — {{ optional($booking->service)->name ?? 'N/A' }}
+                    <br>
+                    <small class="text-muted">{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('d M Y') : '-' }}</small>
+                </div>
+                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                    <span class="badge bg-success me-2">Completed</span>
+                    @if (!empty($booking->patients_id))
+                        <a href="{{ route('caregiver.review.create', $booking->patients_id) }}" class="btn btn-sm btn-outline-primary">Leave Review</a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+@empty
+    <p class="text-muted">No completed bookings yet.</p>
+@endforelse
 @endsection

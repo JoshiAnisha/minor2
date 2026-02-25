@@ -59,9 +59,9 @@
                             <td>{{ $patient->health_condition ?? '-' }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('admin.patient.edit', $patient->id) }}"
+                                    <a href="{{ route('admin.patients.edit', $patient) }}"
                                         class="btn btn-sm btn-info">Edit</a>
-                                    <form action="{{ route('admin.patient.destroy', $patient->id) }}" method="POST">
+                                    <form action="{{ route('admin.patients.destroy', $patient) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-danger"
@@ -74,8 +74,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Invoice;
+use App\Models\Service;
 
 class DashboardController extends Controller
 {
@@ -25,33 +26,38 @@ class DashboardController extends Controller
             return redirect()->route('backend.auth.login')->withErrors(['error' => 'User not found.']);
         }
 
-        // Numeric counts - handle potential errors
+        $patient = $user->patient;
+
         try {
-            $totalBookings = Booking::where('user_id', $user->id)->count();
-            $upcomingServices = Booking::where('user_id', $user->id)
-                                       ->where('status', 'upcoming')
-                                       ->count();
+            $totalBookings = $patient
+                ? Booking::where('patients_id', $patient->id)->count()
+                : 0;
+            $upcomingServices = $patient
+                ? Booking::where('patients_id', $patient->id)->whereIn('status', ['pending', 'accepted'])->whereDate('date_time', '>=', now())->count()
+                : 0;
             $totalInvoices = Invoice::where('user_id', $user->id)->count();
 
-            // Latest 5 bookings with service info
-            $latestBookings = Booking::where('user_id', $user->id)
-                                     ->with('service') // eager load service relation
-                                     ->orderByDesc('created_at')
-                                     ->take(5)
-                                     ->get();
+            $latestBookings = $patient
+                ? Booking::where('patients_id', $patient->id)->with('service', 'caregiver.user')->orderByDesc('created_at')->take(5)->get()
+                : collect([]);
+
+            // Services opened by admin (visible to patients for booking)
+            $availableServices = Service::orderBy('name')->get();
         } catch (\Exception $e) {
             // If there's an error, set defaults
             $totalBookings = 0;
             $upcomingServices = 0;
             $totalInvoices = 0;
             $latestBookings = collect([]);
+            $availableServices = collect([]);
         }
 
         return view('backend.patient.dashboard.index', compact(
             'totalBookings',
             'upcomingServices',
             'totalInvoices',
-            'latestBookings'
+            'latestBookings',
+            'availableServices'
         ));
     }
 }

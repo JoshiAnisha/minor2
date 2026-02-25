@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 // IMPORTANT: model imports
 use App\Models\User;
 use App\Models\Booking;
+use App\Models\ServiceRequest;
 
 class Patient extends Model
 {
@@ -71,11 +72,20 @@ class Patient extends Model
 
     /**
      * Patient → Bookings
-     * (linked through user_id)
      */
     public function bookings()
     {
-        return $this->hasMany(Booking::class, 'user_id', 'user_id');
+        return $this->hasMany(Booking::class, 'patients_id');
+    }
+
+    public function serviceRequests()
+    {
+        return $this->hasMany(ServiceRequest::class, 'patient_id', 'user_id');
+    }
+
+    public function assignedServices()
+    {
+        return $this->hasMany(AssignedService::class, 'patient_id', 'user_id');
     }
 
     public function getProfilePhotoUrlAttribute()

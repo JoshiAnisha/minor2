@@ -9,8 +9,13 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with('service')
-            ->where('patients_id', auth()->id())
+        $patient = auth()->user()->patient;
+        if (!$patient) {
+            return redirect()->route('patient.dashboard')->with('error', 'Patient profile not found.');
+        }
+
+        $bookings = Booking::with('service', 'caregiver.user')
+            ->where('patients_id', $patient->id)
             ->orderBy('start_date', 'desc')
             ->get();
 
@@ -19,8 +24,13 @@ class BookingController extends Controller
 
     public function show($id)
     {
-        $booking = Booking::with('service', 'caregiver')
-            ->where('patients_id', auth()->id())
+        $patient = auth()->user()->patient;
+        if (!$patient) {
+            return redirect()->route('patient.dashboard')->with('error', 'Patient profile not found.');
+        }
+
+        $booking = Booking::with('service', 'caregiver.user')
+            ->where('patients_id', $patient->id)
             ->findOrFail($id);
 
         return view('backend.patient.bookings.show', compact('booking'));

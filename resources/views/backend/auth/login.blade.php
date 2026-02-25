@@ -36,6 +36,8 @@
         </form>
 
         <p class="mt-3 text-center small">
+            <a href="{{ url('/admin/dashboard') }}" class="text-muted">Admin Panel</a>
+            <span class="mx-1">·</span>
             Don't have an account? <a href="{{ route('backend.auth.register') }}" class="text-info">Register</a>
         </p>
     </div>

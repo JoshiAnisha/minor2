@@ -38,13 +38,13 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>
-                                        <strong>{{ optional($review->reviewer)->name ?? 'Unknown' }}</strong>
+                                        <strong>{{ optional($review->user)->name ?? 'Unknown' }}</strong>
                                         <br>
                                         <small class="text-muted">
-                                            @if ($review->reviewer)
-                                                @if ($review->reviewer->role === 'caregiver')
+                                            @if ($review->user)
+                                                @if ($review->user->role === 'caregiver')
                                                     <span class="badge bg-info">Caregiver</span>
-                                                @elseif($review->reviewer->role === 'patient')
+                                                @elseif($review->user->role === 'patient')
                                                     <span class="badge bg-primary">Patient</span>
                                                 @endif
                                             @endif
@@ -52,7 +52,7 @@
                                     </td>
                                     <td>
                                         @if ($review->reviewed_party_type === 'patient')
-                                            <strong>{{ optional($review->reviewed_party->user)->name ?? 'Unknown Patient' }}</strong>
+                                            <strong>{{ optional($review->reviewed_party)->name ?? 'Unknown Patient' }}</strong>
                                             <br>
                                             <small class="text-muted"><span class="badge bg-primary">Patient</span></small>
                                         @elseif($review->reviewed_party_type === 'caregiver')
@@ -78,7 +78,7 @@
                                             <span class="text-muted">N/A</span>
                                         @endif
                                     </td>
-                                    <td>{{ $review->comments ?? 'No comment' }}</td>
+                                    <td>{{ $review->comment ?? 'No comment' }}</td>
                                     <td>{{ optional($review->created_at)->format('Y-m-d H:i') ?? 'N/A' }}</td>
                                     <td>
                                         <form action="{{ route('admin.feedback.delete', $review->id) }}" method="POST"

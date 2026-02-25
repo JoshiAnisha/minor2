@@ -25,7 +25,7 @@
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                <form action="{{ route('admin.patient.update', $patient->id) }}" method="POST">
+                <form action="{{ route('admin.patients.update', $patient) }}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -45,7 +45,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Update Patient</button>
-                    <a href="{{ route('admin.patient') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>

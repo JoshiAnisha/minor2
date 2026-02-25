@@ -15,31 +15,39 @@ class CaregiverBookingController extends Controller
 {
     public function bookings()
     {
-        $caregiverId = Auth::id();
+        $user = Auth::user();
+        $caregiver = $user->caregiver;
+        if (!$caregiver && $user->role === 'caregiver') {
+            $caregiver = \App\Models\Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id]);
+        }
+        if (!$caregiver) {
+            return redirect()->route('caregiver.dashboard')->with('error', 'Caregiver profile not found.');
+        }
+        $caregiverId = $caregiver->id;
 
-        // Pending bids for this caregiver (only valid serviceRequests)
-        $pendingBids = Bid::with('serviceRequest.patient', 'serviceRequest.service')
+        // Pending bids placed by this caregiver (waiting for patient to accept)
+        $pendingBids = Bid::with('serviceRequest.user', 'serviceRequest.service')
             ->where('caregivers_id', $caregiverId)
             ->where('status', 'pending')
             ->get()
             ->filter(fn($bid) => $bid->serviceRequest !== null);
 
-        // Pending service requests not yet accepted by this caregiver
-        $pendingRequests = ServiceRequest::with('patient', 'service')
+        // Pending service requests (caregiver can accept or bid from service-requests page)
+        $pendingRequests = ServiceRequest::with('user', 'service')
             ->where('status', 'pending')
             ->get();
 
-        // Merge bids and requests
+        // Merge bids and requests for "pending" section
         $pendingBookings = $pendingBids->merge($pendingRequests);
 
         // Accepted / In Progress bookings
-        $acceptedBookings = Booking::with('patient', 'service', 'serviceRequest')
+        $acceptedBookings = Booking::with('patient.user', 'service', 'serviceRequest')
             ->where('caregivers_id', $caregiverId)
             ->where('status', 'accepted')
             ->get();
 
         // Completed bookings
-        $completedBookings = Booking::with('patient', 'service', 'serviceRequest')
+        $completedBookings = Booking::with('patient.user', 'service', 'serviceRequest')
             ->where('caregivers_id', $caregiverId)
             ->where('status', 'completed')
             ->get();
@@ -51,28 +59,13 @@ class CaregiverBookingController extends Controller
         ));
     }
 
-    // Accept a bid and create booking
+    /**
+     * Legacy: Patient accepts bids. Caregiver does not accept their own bid.
+     * Redirect caregiver to bookings - they see new booking when patient accepts.
+     */
     public function acceptBid(Bid $bid)
     {
-        if (!$bid->serviceRequest) {
-            return back()->with('error', 'This bid has no valid service request.');
-        }
-
-        $bid->update(['status' => 'accepted']);
-
-        Booking::create([
-            'patients_id' => $bid->serviceRequest->patient_id,
-            'caregivers_id' => $bid->caregivers_id,
-            'services_id' => $bid->serviceRequest->service_id,
-            'status' => 'accepted',
-            'price' => $bid->proposed_price,
-            'location' => $bid->serviceRequest->location ?? 'N/A',
-            'date_time' => now(),
-            'start_date' => now(),
-            'end_date' => now()->addDay(),
-        ]);
-
-        return back()->with('success', 'Bid accepted and added to your bookings.');
+        return back()->with('info', 'The patient must accept your bid. Check back after they respond.');
     }
 
     // Mark booking as completed
@@ -85,9 +78,12 @@ class CaregiverBookingController extends Controller
     // Show patient profile (only if this caregiver has a booking with that patient)
     public function showPatient(Patient $patient)
     {
-        $caregiverId = Auth::id();
+        $caregiver = Auth::user()->caregiver;
+        if (!$caregiver) {
+            abort(403, 'Caregiver profile not found.');
+        }
 
-        $hasRelationship = Booking::where('caregivers_id', $caregiverId)
+        $hasRelationship = Booking::where('caregivers_id', $caregiver->id)
             ->where('patients_id', $patient->id)
             ->exists();
 

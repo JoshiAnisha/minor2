@@ -5,12 +5,14 @@ use Illuminate\Support\Facades\Route;
 // Backend Controllers
 use App\Http\Controllers\Backend\HomeController;
 use App\Http\Controllers\Backend\Auth\AuthController;
+use App\Http\Controllers\Backend\NotificationsController;
 
 // Patient Controllers
 use App\Http\Controllers\Backend\Patient\DashboardController as PatientDashboardController;
 use App\Http\Controllers\Backend\Patient\ProfileController as PatientProfileController;
 use App\Http\Controllers\Backend\Patient\BookingController as PatientBookingController;
 use App\Http\Controllers\Backend\Patient\ServiceController as PatientServiceController;
+use App\Http\Controllers\Backend\Patient\ServiceRequestController as PatientServiceRequestController;
 use App\Http\Controllers\Backend\Patient\InvoiceController as PatientInvoiceController;
 use App\Http\Controllers\Backend\Patient\ReviewController as PatientReviewController;
 
@@ -26,7 +28,8 @@ use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\CaregiverController as AdminCaregiverController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\AppointmentController; 
-use App\Http\Controllers\Admin\DashboardController;   
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FeedbackController;   
 
 // Chat
 use App\Http\Controllers\ChatController;
@@ -86,9 +89,18 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     Route::get('/services/{slug}', [PatientServiceController::class, 'show'])->name('services.show');
     Route::post('/services/book', [PatientServiceController::class, 'book'])->name('services.book');
 
+    // Service Requests (patient's submitted requests)
+    Route::get('/service-requests', [PatientServiceRequestController::class, 'index'])->name('service-requests.index');
+    Route::post('/bids/{bid}/accept', [PatientServiceRequestController::class, 'acceptBid'])->name('bids.accept');
+
     // Bookings
     Route::get('/bookings', [PatientBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{id}', [PatientBookingController::class, 'show'])->name('bookings.show');
+
+    // Notifications
+    Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationsController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::post('/notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.mark-read');
 });
 
 
@@ -139,6 +151,9 @@ Route::middleware(['auth'])
         Route::post('/service-request/{id}/accept-base', [ServiceRequestController::class, 'acceptBasePrice'])
             ->name('service.acceptBase');
 
+        Route::post('/service-request/{id}/reject', [ServiceRequestController::class, 'reject'])
+            ->name('service.reject');
+
         Route::post('/service-request/bid', [ServiceRequestController::class, 'placeBid'])
             ->name('service.placeBid');
 
@@ -162,6 +177,14 @@ Route::middleware(['auth'])
 
         Route::get('/profile/certificate', [ProfileController::class, 'viewCertificate'])
             ->name('profile.certificate');
+
+        // Notifications
+        Route::get('/notifications', [NotificationsController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/notifications/mark-all-read', [NotificationsController::class, 'markAllAsRead'])
+            ->name('notifications.mark-all-read');
+        Route::post('/notifications/{id}/read', [NotificationsController::class, 'markAsRead'])
+            ->name('notifications.mark-read');
     });
 
 
@@ -182,12 +205,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Manage Caregivers
     Route::resource('/caregivers', AdminCaregiverController::class);
+    Route::patch('/caregivers/{caregiver}/toggle-status', [AdminCaregiverController::class, 'toggleStatus'])->name('caregivers.toggle-status');
 
-    // Manage Services
+    // Manage Services (admin opens services for patient booking)
     Route::resource('/services', AdminServiceController::class);
 
     // Appointments
     Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+
+    // Feedback
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback');
+    Route::delete('/feedback/{id}', [FeedbackController::class, 'destroy'])->name('feedback.delete');
+
+    // Route aliases for existing views
+    Route::redirect('/patient', '/admin/patients', 301)->name('patient');
+    Route::redirect('/caregiver', '/admin/caregivers', 301)->name('caregiver');
+    Route::redirect('/appointment', '/admin/appointments', 301)->name('appointment');
 });
 
 

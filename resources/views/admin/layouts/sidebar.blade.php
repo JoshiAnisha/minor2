@@ -23,19 +23,19 @@
 </style>
 <div class="col-lg-2 col-md-3 sidebar p-3">
     <div class="text-left mb-4">
-        <a href="admin.html">
+        <a href="{{ route('admin.dashboard') }}">
             <img src="{{ asset('images/logo.png') }}" alt="SewaCare Logo" class="img-fluid logo-img">
         </a>
     </div>
     <nav class="nav flex-column">
         <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
         <a class="nav-link" href="{{ route('admin.appointment') }}">Appointments</a>
+        <a class="nav-link" href="{{ route('admin.services.index') }}">Services</a>
         <a class="nav-link" href="{{ route('admin.patient') }}">Patient</a>
         <a class="nav-link" href="{{ route('admin.caregiver') }}">Caregivers</a>
         <a class="nav-link" href="{{ route('admin.feedback') }}">Feedback</a>
-        <form action="{{ route('logout') }}" method="POST"
+        <form action="{{ route('backend.auth.logout') }}" method="POST"
             onsubmit="return confirm('Are you sure you want to logout?')">
-
             @csrf
             <button type="submit" class="nav-link text-danger btn btn-link p-0 text-start">
                 Logout

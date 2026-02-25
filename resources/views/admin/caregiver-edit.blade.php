@@ -4,7 +4,7 @@
     <div class="container">
         <h3>Edit Caregiver</h3>
 
-        <form action="{{ route('admin.caregiver.update', $caregiver->id) }}" method="POST">
+        <form action="{{ route('admin.caregivers.update', $caregiver) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -29,7 +29,7 @@
             </div>
 
             <button class="btn btn-success">Update</button>
-            <a href="{{ route('admin.caregiver') }}" class="btn btn-secondary">Back</a>
+            <a href="{{ route('admin.caregivers.index') }}" class="btn btn-secondary">Back</a>
         </form>
     </div>
 @endsection

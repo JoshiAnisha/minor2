@@ -39,5 +39,10 @@ class Booking extends Model
     {
         return $this->belongsTo(Caregiver::class, 'caregivers_id');
     }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class, 'patients_id');
+    }
 }
 

@@ -10,37 +10,35 @@ use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
+    public function index()
+    {
+        if (Auth::check() && Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
+        $services = Service::orderBy('name')->get();
+        return view('admin.services.index', compact('services'));
+    }
+
     /**
      * Show the form for creating a new service.
      */
     public function create()
     {
-        // Verify user is authenticated admin
         if (Auth::check() && Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized access.');
         }
-
-        return view('admin.service-create');
+        return view('admin.services.create');
     }
 
     /**
      * Store a newly created service in storage.
-     *
-     * Validates inputs according to column types:
-     * - name: string (required, max 255)
-     * - slug: string (nullable, unique, max 255)
-     * - details: text (nullable)
-     * - base_price: float (required, numeric, min 0)
-     * - service_type: string (required, must be 'medical' or 'regular')
      */
     public function store(Request $request)
     {
-        // Verify user is admin
         if (Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized access.');
         }
 
-        // Validate inputs according to column types
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:services,slug',
@@ -49,24 +47,99 @@ class ServiceController extends Controller
             'service_type' => 'required|string|in:medical,regular',
         ]);
 
-        // Auto-generate slug from name if not provided
-        if (empty($validated['slug'])) {
+        $slug = isset($validated['slug']) ? trim($validated['slug']) : '';
+        if ($slug === '') {
             $validated['slug'] = Str::slug($validated['name']);
-
-            // Ensure slug is unique
             $originalSlug = $validated['slug'];
             $counter = 1;
             while (Service::where('slug', $validated['slug'])->exists()) {
                 $validated['slug'] = $originalSlug . '-' . $counter;
                 $counter++;
             }
+        } else {
+            $validated['slug'] = Str::slug($slug);
+            if ($validated['slug'] === '') {
+                $validated['slug'] = Str::slug($validated['name']);
+            }
         }
 
-        // Save service using Service::create() which respects $fillable
         Service::create($validated);
 
-        // Redirect back to form with success message
-        return redirect()->route('admin.services.create')
-            ->with('success', 'Service created successfully!');
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Service created successfully! It is now visible to patients and caregivers.');
+    }
+
+    /**
+     * Display the specified service.
+     */
+    public function show(Service $service)
+    {
+        if (Auth::check() && Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
+        return view('admin.services.show', compact('service'));
+    }
+
+    /**
+     * Show the form for editing the specified service.
+     */
+    public function edit(Service $service)
+    {
+        if (Auth::check() && Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
+        return view('admin.services.edit', compact('service'));
+    }
+
+    /**
+     * Update the specified service in storage.
+     */
+    public function update(Request $request, Service $service)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:services,slug,' . $service->id,
+            'details' => 'nullable|string',
+            'base_price' => 'required|numeric|min:0',
+            'service_type' => 'required|string|in:medical,regular',
+        ]);
+
+        $slug = isset($validated['slug']) ? trim($validated['slug']) : '';
+        if ($slug === '') {
+            $validated['slug'] = Str::slug($validated['name']);
+            $originalSlug = $validated['slug'];
+            $counter = 1;
+            while (Service::where('slug', $validated['slug'])->where('id', '!=', $service->id)->exists()) {
+                $validated['slug'] = $originalSlug . '-' . $counter;
+                $counter++;
+            }
+        } else {
+            $validated['slug'] = Str::slug($slug);
+            if ($validated['slug'] === '') {
+                $validated['slug'] = Str::slug($validated['name']);
+            }
+        }
+
+        $service->update($validated);
+
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Service updated successfully.');
+    }
+
+    /**
+     * Remove the specified service from storage.
+     */
+    public function destroy(Service $service)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
+        $service->delete();
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Service deleted successfully.');
     }
 }
