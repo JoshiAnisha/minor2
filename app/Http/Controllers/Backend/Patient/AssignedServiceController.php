@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Patient;
 use App\Http\Controllers\Controller;
 use App\Models\AssignedService;
 use App\Models\AssignedServiceBid;
+use App\Notifications\PatientAcceptedAssignedBidNotification;
 use Illuminate\Http\Request;
 
 class AssignedServiceController extends Controller
@@ -65,8 +66,17 @@ class AssignedServiceController extends Controller
                 ->update(['status' => 'rejected']);
         });
 
+        // Notify the caregiver that their bid was accepted
+        $caregiverUser = $bid->caregiver?->user;
+        if ($caregiverUser) {
+            $caregiverUser->notify(new PatientAcceptedAssignedBidNotification(
+                $bid->fresh(),
+                auth()->user()->name ?? 'The patient'
+            ));
+        }
+
         return redirect()->route('patient.assigned-services.index')
-            ->with('success', 'Bid accepted. Caregiver has been assigned.');
+            ->with('success', 'Bid accepted. Caregiver has been notified.');
     }
 
     /**

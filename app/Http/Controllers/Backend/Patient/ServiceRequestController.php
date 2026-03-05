@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Patient;
 
 use App\Http\Controllers\Controller;
+use App\Models\Service;
 use App\Models\ServiceRequest;
 use App\Models\Bid;
 use App\Models\Booking;
@@ -11,6 +12,24 @@ use Illuminate\Http\Request;
 
 class ServiceRequestController extends Controller
 {
+    /**
+     * Form to request a service not in the catalog (custom request).
+     * Uses the "Other" service; description is required.
+     */
+    public function createCustom()
+    {
+        $service = Service::firstOrCreate(
+            ['slug' => 'other-custom-request'],
+            [
+                'name' => 'Other (describe in request)',
+                'details' => 'Describe your need; caregivers can respond.',
+                'base_price' => 0,
+                'service_type' => 'regular',
+            ]
+        );
+        return view('backend.patient.service-requests.create-custom', compact('service'));
+    }
+
     /**
      * List patient's service requests and related bids/bookings.
      */
@@ -44,7 +63,14 @@ class ServiceRequestController extends Controller
         $bid->update(['status' => 'accepted']);
         $bid->serviceRequest->update(['status' => 'accepted']);
 
-        $patient = auth()->user()->patient;
+        $patientUser = auth()->user();
+        $patient = $patientUser->patient;
+        if (!$patient) {
+            $patient = \App\Models\Patient::firstOrCreate(
+                ['user_id' => $patientUser->id],
+                ['email' => $patientUser->email]
+            );
+        }
 
         $preferredTime = $bid->serviceRequest->preferred_time
             ? \Carbon\Carbon::parse($bid->serviceRequest->preferred_time)
@@ -83,5 +109,30 @@ class ServiceRequestController extends Controller
 
         return redirect()->route('patient.bookings.index')
             ->with('success', 'Bid accepted! Booking created successfully.');
+    }
+
+    /**
+     * Patient rejects a caregiver's bid.
+     */
+    public function rejectBid(Request $request, Bid $bid)
+    {
+        if (auth()->id() !== $bid->serviceRequest->patient_id) {
+            abort(403, 'Unauthorized');
+        }
+        if ($bid->status !== 'pending') {
+            return back()->with('error', 'This bid is no longer available.');
+        }
+
+        $bid->update(['status' => 'rejected']);
+
+        $caregiverUser = $bid->caregiver?->user;
+        if ($caregiverUser) {
+            $caregiverUser->notify(new \App\Notifications\PatientRejectedBidNotification(
+                $bid,
+                auth()->user()->name ?? 'Patient'
+            ));
+        }
+
+        return back()->with('success', 'Bid rejected. The caregiver has been removed from this request.');
     }
 }

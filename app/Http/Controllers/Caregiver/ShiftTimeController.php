@@ -10,11 +10,15 @@ use App\Models\CaregiverShiftTime;
 class ShiftTimeController extends Controller
 {
     /**
-     * Show shift-time form
+     * Show shift-time form and list of saved schedule entries
      */
     public function index()
     {
-        return view('Caregiver.shiftTime');
+        $shiftTimes = CaregiverShiftTime::where('caregiver_id', Auth::id())
+            ->orderBy('available_date')
+            ->orderBy('start_time')
+            ->get();
+        return view('Caregiver.shiftTime', compact('shiftTimes'));
     }
 
     /**
@@ -23,7 +27,7 @@ class ShiftTimeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'shift' => 'required|in:Day,Night,Both',
+            'shift' => 'required|in:Morning,Day,Night,Both',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
             'day' => 'required|string',

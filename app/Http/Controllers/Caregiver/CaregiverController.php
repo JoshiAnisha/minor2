@@ -24,7 +24,12 @@ class CaregiverController extends Controller
                 ->latest()
                 ->take(5)
                 ->get();
-            $availableServices = Service::orderBy('name')->get();
+            $today = now()->toDateString();
+            $availableServices = Service::where(function ($q) use ($today) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
+            })->where(function ($q) use ($today) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
+            })->orderBy('name')->get();
             return view('Caregiver.dashboard', [
                 'upcomingVisits' => 0,
                 'tasksToLog' => 0,
@@ -92,7 +97,12 @@ class CaregiverController extends Controller
                 ->count();
         }
 
-        $availableServices = Service::orderBy('name')->get();
+        $today = now()->toDateString();
+        $availableServices = Service::where(function ($q) use ($today) {
+            $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
+        })->where(function ($q) use ($today) {
+            $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
+        })->orderBy('name')->get();
 
         return view('Caregiver.dashboard', compact(
             'upcomingVisits',

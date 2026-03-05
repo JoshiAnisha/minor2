@@ -48,13 +48,30 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
+    @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show">{{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if (isset($hasNoSchedule) && $hasNoSchedule)
+        <div class="alert alert-warning mb-4">
+            <strong>No schedule set.</strong> Add your availability in <a href="{{ route('caregiver.shift.index') }}">My Schedule</a>. Only requests that match your shift (Morning/Day/Night) and date will appear here for you to accept or reject.
+        </div>
+    @endif
 
     @if ($requests->isEmpty())
         <div class="card request-card shadow-sm">
             <div class="card-body text-center py-5">
                 <i class="bi bi-inbox display-4 text-muted mb-3"></i>
                 <h5 class="text-muted">No pending service requests</h5>
-                <p class="text-muted mb-0">New requests from patients will appear here. Check back later.</p>
+                <p class="text-muted mb-0">
+                    @if (isset($hasNoSchedule) && $hasNoSchedule)
+                        Add your shift and dates in <a href="{{ route('caregiver.shift.index') }}">My Schedule</a> to see matching requests.
+                    @else
+                        No requests match your schedule right now, or no new requests from patients. Check back later.
+                    @endif
+                </p>
             </div>
         </div>
     @else
@@ -99,13 +116,18 @@
                                     <button type="submit" class="btn btn-success btn-accept btn-sm">Accept at base price</button>
                                 </form>
                                 <span class="text-muted">or</span>
+                                @php $basePrice = (float) ($serviceRequest->service->base_price ?? 0); @endphp
                                 <form method="POST" action="{{ route('caregiver.service.placeBid') }}" class="d-inline">
                                     @csrf
                                     <input type="hidden" name="service_request_id" value="{{ $serviceRequest->id }}">
-                                    <div class="input-group input-group-sm" style="max-width: 200px;">
-                                        <span class="input-group-text">Rs</span>
-                                        <input type="number" name="proposed_price" class="form-control" required placeholder="Your bid" step="0.01" min="0.01">
-                                        <button type="submit" class="btn btn-warning">Bid</button>
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <small class="text-muted">Base: Rs {{ number_format($basePrice, 0) }}</small>
+                                        <div class="input-group input-group-sm" style="max-width: 220px;">
+                                            <span class="input-group-text text-muted small">+ Rs</span>
+                                            <input type="number" name="add_to_base" class="form-control" required placeholder="Add amount" step="0.01" min="0" title="Amount to add to base price. Total = base + this.">
+                                            <button type="submit" class="btn btn-warning">Bid</button>
+                                        </div>
+                                        <small class="text-muted">= your total bid (base + amount)</small>
                                     </div>
                                 </form>
                             </div>

@@ -3,11 +3,23 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Service;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return view('backend.home');
+        $today = now()->toDateString();
+        $services = Service::where('slug', '!=', 'other-custom-request')
+            ->where(function ($q) use ($today) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
+            })
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('backend.home', compact('services'));
     }
 }

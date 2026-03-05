@@ -4,13 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Bid;
 use App\Models\Booking;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class PatientAcceptedBidNotification extends Notification implements ShouldQueue
+class PatientAcceptedBidNotification extends Notification
 {
-    use Queueable;
 
     public function __construct(
         public Bid $bid,

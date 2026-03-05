@@ -16,10 +16,11 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #e0f2fe; color: #1e293b; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f9ff; color: #1e293b; }
         .main-content { margin-left: 260px; padding: 2rem; min-height: 100vh; }
-        .btn-primary, .btn-info { background-color: #0ea5e9; border-color: #0ea5e9; }
+        .btn-primary, .btn-info { background-color: #0ea5e9; border-color: #0ea5e9; border-radius: 10px; font-weight: 500; }
         .btn-primary:hover, .btn-info:hover { background-color: #0284c7; border-color: #0284c7; }
+        .card { border-radius: 16px; border: none; }
     </style>
 
     @stack('styles')

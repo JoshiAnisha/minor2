@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Caregiver;
 use App\Http\Controllers\Controller;
 use App\Models\AssignedService;
 use App\Models\AssignedServiceBid;
+use App\Notifications\CaregiverPlacedAssignedBidNotification;
 use Illuminate\Http\Request;
 
 class AssignedServiceController extends Controller
@@ -90,7 +91,7 @@ class AssignedServiceController extends Controller
             return back()->with('error', 'You have already placed a bid on this service.');
         }
 
-        AssignedServiceBid::create([
+        $bid = AssignedServiceBid::create([
             'assigned_service_id' => $assignedService->id,
             'caregiver_id'        => $caregiver->id,
             'proposed_price'      => $validated['proposed_price'],
@@ -98,7 +99,16 @@ class AssignedServiceController extends Controller
             'status'              => 'pending',
         ]);
 
+        // Notify the patient that a caregiver placed a bid
+        $patientUser = $assignedService->patient;
+        if ($patientUser) {
+            $patientUser->notify(new CaregiverPlacedAssignedBidNotification(
+                $bid->load('assignedService'),
+                $caregiver->user?->name ?? 'A caregiver'
+            ));
+        }
+
         return redirect()->route('caregiver.assigned-services.my-bids')
-            ->with('success', 'Your bid was submitted successfully.');
+            ->with('success', 'Your bid was submitted successfully. Patient has been notified.');
     }
 }

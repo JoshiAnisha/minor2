@@ -16,7 +16,7 @@
 
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                @if ($services->isEmpty())
+                @if (!isset($services) || $services->isEmpty())
                     <div class="text-center py-5 text-muted">
                         <i class="bi bi-bag-plus display-4"></i>
                         <p class="mb-2 mt-2">No services yet</p>

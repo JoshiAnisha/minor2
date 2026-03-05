@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Caregiver;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Bid;
+use App\Models\Invoice;
 use App\Models\Patient;
 use App\Models\Review;
 use App\Models\ServiceRequest;
@@ -68,11 +69,63 @@ class CaregiverBookingController extends Controller
         return back()->with('info', 'The patient must accept your bid. Check back after they respond.');
     }
 
-    // Mark booking as completed
+    // Mark booking as completed (starts payment: invoice is created for patient)
     public function complete(Booking $booking)
     {
+        $booking->load('patient', 'service');
+        if ($booking->status === 'completed') {
+            return back()->with('info', 'Booking is already completed.');
+        }
+
         $booking->update(['status' => 'completed']);
-        return back()->with('success', 'Booking marked as completed.');
+
+        // Create invoice for patient so they can pay; payment flow starts here
+        $patientUserId = $booking->patient?->user_id;
+        if ($patientUserId && !Invoice::where('booking_id', $booking->id)->exists()) {
+            $invoiceNumber = 'INV-' . str_pad((string) (Invoice::max('id') ?? 0) + 1, 5, '0', STR_PAD_LEFT);
+            Invoice::create([
+                'user_id'        => $patientUserId,
+                'booking_id'     => $booking->id,
+                'invoice_number' => $invoiceNumber,
+                'amount'         => $booking->price ?? 0,
+                'status'        => 'pending',
+                'due_date'      => now()->addDays(7),
+                'notes'         => 'Service: ' . ($booking->service?->name ?? 'Care'),
+            ]);
+        }
+
+        return back()->with('success', 'Booking completed. Patient can pay from their Invoices page.');
+    }
+
+    // Caregiver marks payment as received (updates booking + invoice so both sides show paid)
+    public function markPaid(Booking $booking)
+    {
+        $caregiver = Auth::user()->caregiver;
+        if (!$caregiver || $booking->caregivers_id != $caregiver->id) {
+            abort(403, 'Unauthorized.');
+        }
+        if ($booking->status !== 'completed') {
+            return back()->with('error', 'Only completed bookings can be marked as paid.');
+        }
+        if (($booking->payment_status ?? '') === 'paid') {
+            return back()->with('info', 'Payment already recorded.');
+        }
+
+        $booking->update(['payment_status' => 'paid']);
+        Invoice::where('booking_id', $booking->id)->update([
+            'status'    => 'paid',
+            'paid_date' => now(),
+        ]);
+
+        $patientUser = $booking->patient?->user;
+        if ($patientUser) {
+            $patientUser->notify(new \App\Notifications\CaregiverMarkedPaymentReceivedNotification(
+                $booking,
+                Auth::user()->name ?? 'Caregiver'
+            ));
+        }
+
+        return back()->with('success', 'Payment marked as received. Invoice updated for patient.');
     }
 
     // Show patient profile (only if this caregiver has a booking with that patient)
@@ -149,13 +202,17 @@ class CaregiverBookingController extends Controller
             return back()->with('error', 'You can only review patients from your completed bookings.');
         }
 
-        // Create review using only existing columns from migration
-        // Note: bookings_id is constrained to caregivers table, so it stores caregiver ID
+        $booking = Booking::where('caregivers_id', $caregiver->id)
+            ->where('patients_id', $patientId)
+            ->where('status', 'completed')
+            ->first();
+
         Review::create([
-            'user_id' => $caregiverUserId, // Reviewer (caregiver's user_id from users table)
-            'bookings_id' => $caregiver->id, // Caregiver ID (from caregivers table, per migration constraint)
-            'rating' => $request->rating,
-            'comments' => $request->comment ?? null, // Use 'comments' (plural) as per migration
+            'user_id'     => $caregiverUserId,
+            'service_id'  => $booking?->services_id,
+            'booking_id'  => $booking?->id,
+            'rating'      => $request->rating,
+            'comment'     => $request->comment ?? '',
         ]);
 
         return redirect()->route('caregiver.bookings')

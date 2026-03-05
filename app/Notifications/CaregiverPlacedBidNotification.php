@@ -4,13 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Bid;
 use App\Models\ServiceRequest;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class CaregiverPlacedBidNotification extends Notification implements ShouldQueue
+class CaregiverPlacedBidNotification extends Notification
 {
-    use Queueable;
 
     public function __construct(
         public Bid $bid,

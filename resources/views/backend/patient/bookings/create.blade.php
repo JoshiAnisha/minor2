@@ -1,6 +1,6 @@
 @extends('backend.layouts.dashboard.app')
 
-@section('title', $service->name)
+@section('title', 'Book ' . $service->name)
 
 @section('content')
 <div class="mb-3">
@@ -11,7 +11,7 @@
     <div class="card-body p-4">
         <h2 class="h5 fw-bold mb-2">{{ $service->name }}</h2>
         @if(!empty($service->details))
-            <p class="text-muted small mb-2">{{ $service->details }}</p>
+            <p class="text-muted small mb-2">{{ Str::limit($service->details, 200) }}</p>
         @endif
         <p class="fw-bold text-primary mb-0">Rs {{ number_format((float) ($service->base_price ?? 0), 0) }}</p>
     </div>
@@ -20,6 +20,7 @@
 <div class="card border-0 shadow-sm" style="border-radius: 16px;">
     <div class="card-body p-4">
         <h5 class="fw-bold mb-3">Request details</h5>
+
         @if (session('error'))
             <div class="alert alert-danger py-2 small">{{ session('error') }}</div>
         @endif

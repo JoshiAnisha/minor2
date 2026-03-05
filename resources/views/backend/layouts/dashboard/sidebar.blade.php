@@ -16,7 +16,7 @@
     <ul class="nav flex-column p-2">
         <li class="nav-item mb-1">
             <a class="nav-link {{ request()->routeIs('patient.dashboard') ? 'active' : '' }}" href="{{ route('patient.dashboard') }}">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                <i class="bi bi-house me-2"></i> Home
             </a>
         </li>
         <li class="nav-item mb-1">
@@ -53,11 +53,6 @@
             </a>
         </li>
         <hr class="my-2 mx-2 border-secondary opacity-50">
-        <li class="nav-item mb-1">
-            <a class="nav-link" href="{{ route('home') }}">
-                <i class="bi bi-house me-2"></i> Home
-            </a>
-        </li>
         <li class="nav-item">
             <form action="{{ route('backend.auth.logout') }}" method="POST" class="m-0 p-2">
                 @csrf

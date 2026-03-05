@@ -7,7 +7,7 @@
                 <h3 class="mb-0">Create New Service</h3>
             </div>
             <div class="card-body">
-                @if ($errors->any())
+                @if (isset($errors) && $errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
                             @foreach ($errors->all() as $error)

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Models\User;
+use App\Notifications\NewServiceOpenedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -12,10 +14,13 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        if (Auth::check() && Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
+        $this->authorizeAdmin();
+        try {
+            $services = Service::orderBy('name')->get();
+        } catch (\Throwable $e) {
+            \Log::warning('Admin services index: ' . $e->getMessage());
+            $services = collect([]);
         }
-        $services = Service::orderBy('name')->get();
         return view('admin.services.index', compact('services'));
     }
 
@@ -24,10 +29,22 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        if (Auth::check() && Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAdmin();
         return view('admin.services.create');
+    }
+
+    /**
+     * Ensure the current user is an admin.
+     */
+    private function authorizeAdmin(): void
+    {
+        if (!Auth::check()) {
+            abort(403, 'You must be logged in to access this page.');
+        }
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            abort(403, 'Unauthorized. Admin access required.');
+        }
     }
 
     /**
@@ -35,9 +52,7 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAdmin();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -63,10 +78,15 @@ class ServiceController extends Controller
             }
         }
 
-        Service::create($validated);
+        $service = Service::create($validated);
+
+        // Notify all patients and caregivers that a new service is available
+        User::whereIn('role', ['patient', 'caregiver'])->get()->each(function (User $user) use ($service) {
+            $user->notify(new NewServiceOpenedNotification($service));
+        });
 
         return redirect()->route('admin.services.index')
-            ->with('success', 'Service created successfully! It is now visible to patients and caregivers.');
+            ->with('success', 'Service created successfully! Patients and caregivers have been notified.');
     }
 
     /**
@@ -74,9 +94,7 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        if (Auth::check() && Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAdmin();
         return view('admin.services.show', compact('service'));
     }
 
@@ -85,9 +103,7 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
-        if (Auth::check() && Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAdmin();
         return view('admin.services.edit', compact('service'));
     }
 
@@ -96,9 +112,7 @@ class ServiceController extends Controller
      */
     public function update(Request $request, Service $service)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAdmin();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -135,9 +149,7 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAdmin();
         $service->delete();
         return redirect()->route('admin.services.index')
             ->with('success', 'Service deleted successfully.');

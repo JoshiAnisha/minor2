@@ -6,18 +6,59 @@
             <div class="col-md-12 main-content">
                 <div class="card shadow-sm mb-4 mt-4">
                     <div class="card-body p-4">
-                        <h3 class="text-center fw-bold mb-4">My Available Shift and Time</h3>
+                        <h3 class="text-center fw-bold mb-4">My Schedule</h3>
 
+                        @if (session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+
+                        @if (isset($shiftTimes) && $shiftTimes->isNotEmpty())
+                            <div class="mb-4">
+                                <h5 class="fw-bold mb-3">Your saved availability</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Shift</th>
+                                                <th>Time</th>
+                                                <th>Day</th>
+                                                <th>Date</th>
+                                                <th>Service</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($shiftTimes as $st)
+                                                <tr>
+                                                    <td>{{ $st->shift }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($st->start_time)->format('g:i A') }} – {{ \Carbon\Carbon::parse($st->end_time)->format('g:i A') }}</td>
+                                                    <td>{{ $st->day }}</td>
+                                                    <td>{{ $st->available_date ? \Carbon\Carbon::parse($st->available_date)->format('M d, Y') : '—' }}</td>
+                                                    <td>{{ $st->service }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="text-muted small mb-0">Service requests that match your shift and date will appear in <strong>Service Requests</strong>.</p>
+                            </div>
+                        @else
+                            <div class="alert alert-info mb-4">
+                                <strong>No schedule yet.</strong> Add your availability below. Only service requests that match your shift and date will be shown to you for accept/reject.
+                            </div>
+                        @endif
+
+                        <h5 class="fw-bold mb-3">Add availability</h5>
                         <form id="availabilityForm" method="POST" action="{{ route('caregiver.shift.store') }}">
                             @csrf
 
                             {{-- Shift --}}
                             <div class="mb-3">
-                                <label class="form-label">Preferred Shift</label>
-                                <div class="btn-group w-100">
-                                    <input type="radio" name="shift" value="Day" required> Day
-                                    <input type="radio" name="shift" value="Night" required> Night
-                                    <input type="radio" name="shift" value="Both" required> Both
+                                <label class="form-label">Preferred Shift <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <label class="form-check"><input type="radio" name="shift" value="Morning" class="form-check-input" required> Morning</label>
+                                    <label class="form-check"><input type="radio" name="shift" value="Day" class="form-check-input"> Day</label>
+                                    <label class="form-check"><input type="radio" name="shift" value="Night" class="form-check-input"> Night</label>
+                                    <label class="form-check"><input type="radio" name="shift" value="Both" class="form-check-input"> Both</label>
                                 </div>
                             </div>
 
@@ -100,15 +141,22 @@
                 const startHour = parseInt(start.split(':')[0]);
                 const endHour = parseInt(end.split(':')[0]);
 
-                // Day shift: 06:00 - 17:59
-                if (selectedShift === 'Day') {
-                    if (startHour < 6 || startHour >= 18 || endHour < 6 || endHour >= 18) {
-                        alert('For Day shift, time must be between 06:00 and 18:00.');
+                // Morning: 06:00 - 11:59
+                if (selectedShift === 'Morning') {
+                    if (startHour < 6 || startHour >= 12 || endHour < 6 || endHour > 12) {
+                        alert('For Morning shift, time must be between 06:00 and 12:00.');
                         e.preventDefault();
                         return false;
                     }
                 }
-
+                // Day shift: 12:00 - 17:59
+                if (selectedShift === 'Day') {
+                    if (startHour < 12 || startHour >= 18 || endHour < 12 || endHour >= 18) {
+                        alert('For Day shift, time must be between 12:00 and 18:00.');
+                        e.preventDefault();
+                        return false;
+                    }
+                }
                 // Night shift: 18:00 - 05:59
                 if (selectedShift === 'Night') {
                     if (!((startHour >= 18 || startHour < 6) && (endHour > 18 || endHour <= 6))) {

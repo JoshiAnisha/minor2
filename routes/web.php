@@ -13,6 +13,7 @@ use App\Http\Controllers\Backend\Patient\ProfileController as PatientProfileCont
 use App\Http\Controllers\Backend\Patient\BookingController as PatientBookingController;
 use App\Http\Controllers\Backend\Patient\ServiceController as PatientServiceController;
 use App\Http\Controllers\Backend\Patient\ServiceRequestController as PatientServiceRequestController;
+use App\Http\Controllers\Backend\Patient\AssignedServiceController as PatientAssignedServiceController;
 use App\Http\Controllers\Backend\Patient\InvoiceController as PatientInvoiceController;
 use App\Http\Controllers\Backend\Patient\ReviewController as PatientReviewController;
 
@@ -20,6 +21,7 @@ use App\Http\Controllers\Backend\Patient\ReviewController as PatientReviewContro
 use App\Http\Controllers\Caregiver\CaregiverController;
 use App\Http\Controllers\Caregiver\ShiftTimeController;
 use App\Http\Controllers\Caregiver\ServiceRequestController;
+use App\Http\Controllers\Caregiver\AssignedServiceController as CaregiverAssignedServiceController;
 use App\Http\Controllers\Caregiver\CaregiverBookingController;
 use App\Http\Controllers\Caregiver\ProfileController;  
 
@@ -78,6 +80,7 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     // Invoices
     Route::get('/invoices', [PatientInvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{id}', [PatientInvoiceController::class, 'show'])->name('invoices.show');
+    Route::post('/invoices/{invoice}/pay', [PatientInvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
 
     // Reviews
     Route::get('/reviews', [PatientReviewController::class, 'index'])->name('reviews.index');
@@ -91,11 +94,19 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
 
     // Service Requests (patient's submitted requests)
     Route::get('/service-requests', [PatientServiceRequestController::class, 'index'])->name('service-requests.index');
+    Route::get('/service-requests/custom', [PatientServiceRequestController::class, 'createCustom'])->name('service-requests.create-custom');
     Route::post('/bids/{bid}/accept', [PatientServiceRequestController::class, 'acceptBid'])->name('bids.accept');
+    Route::post('/bids/{bid}/reject', [PatientServiceRequestController::class, 'rejectBid'])->name('bids.reject');
 
     // Bookings
     Route::get('/bookings', [PatientBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/create', [PatientBookingController::class, 'create'])->name('bookings.create');
     Route::get('/bookings/{id}', [PatientBookingController::class, 'show'])->name('bookings.show');
+
+    // Assigned services (admin-assigned; patient accepts caregiver bids)
+    Route::get('/assigned-services', [PatientAssignedServiceController::class, 'index'])->name('assigned-services.index');
+    Route::post('/assigned-services/bids/{assigned_service_bid}/accept', [PatientAssignedServiceController::class, 'acceptBid'])->name('assigned-services.accept-bid');
+    Route::post('/assigned-services/bids/{assigned_service_bid}/reject', [PatientAssignedServiceController::class, 'rejectBid'])->name('assigned-services.reject-bid');
 
     // Notifications
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
@@ -130,6 +141,9 @@ Route::middleware(['auth'])
         Route::post('/booking/{booking}/complete', [CaregiverBookingController::class, 'complete'])
             ->name('booking.complete');
 
+        Route::post('/booking/{booking}/mark-paid', [CaregiverBookingController::class, 'markPaid'])
+            ->name('booking.mark-paid');
+
         // ========================
         // Patient Profile & Reviews
         // ========================
@@ -156,6 +170,14 @@ Route::middleware(['auth'])
 
         Route::post('/service-request/bid', [ServiceRequestController::class, 'placeBid'])
             ->name('service.placeBid');
+
+        // Assigned services (admin-assigned; caregiver places bids)
+        Route::get('/assigned-services', [CaregiverAssignedServiceController::class, 'index'])
+            ->name('assigned-services.index');
+        Route::get('/assigned-services/my-bids', [CaregiverAssignedServiceController::class, 'myBids'])
+            ->name('assigned-services.my-bids');
+        Route::post('/assigned-services/place-bid', [CaregiverAssignedServiceController::class, 'placeBid'])
+            ->name('assigned-services.place-bid');
 
         // ========================
         // Shift Time / Availability

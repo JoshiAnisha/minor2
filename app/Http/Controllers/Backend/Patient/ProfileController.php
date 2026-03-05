@@ -69,8 +69,9 @@ class ProfileController extends Controller
                 ->store('patients', 'public');
         }
 
-        // ✅ Update patient fields
+        // ✅ Update patient fields (include contact_number so profile show has it)
         $patient->fill([
+            'contact_number'           => $validated['contact_number'] ?? null,
             'date_of_birth'            => $validated['date_of_birth'] ?? null,
             'gender'                   => $validated['gender'] ?? null,
             'blood_group'              => $validated['blood_group'] ?? null,

@@ -41,8 +41,16 @@ class DashboardController extends Controller
                 ? Booking::where('patients_id', $patient->id)->with('service', 'caregiver.user')->orderByDesc('created_at')->take(5)->get()
                 : collect([]);
 
-            // Services opened by admin (visible to patients for booking)
-            $availableServices = Service::orderBy('name')->get();
+            // Catalog services (exclude "Other" which is only for custom request)
+            $today = now()->toDateString();
+            $availableServices = Service::where('slug', '!=', 'other-custom-request')
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
+                })
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
+                })
+                ->orderBy('name')->get();
         } catch (\Exception $e) {
             // If there's an error, set defaults
             $totalBookings = 0;

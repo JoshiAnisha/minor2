@@ -12,8 +12,20 @@
 </div>
 
 @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+@if (session('info'))
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {{ session('info') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 @endif
@@ -91,6 +103,15 @@
                 </div>
                 <div class="col-md-4 text-md-end mt-2 mt-md-0">
                     <span class="badge bg-success me-2">Completed</span>
+                    @if(($booking->payment_status ?? '') === 'paid')
+                        <span class="badge bg-primary me-2">Paid</span>
+                    @else
+                        <span class="badge bg-warning text-dark me-2">Pending payment</span>
+                        <form action="{{ route('caregiver.booking.mark-paid', $booking->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Mark payment as received?');">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-primary">Mark payment received</button>
+                        </form>
+                    @endif
                     @if (!empty($booking->patients_id))
                         <a href="{{ route('caregiver.review.create', $booking->patients_id) }}" class="btn btn-sm btn-outline-primary">Leave Review</a>
                     @endif
