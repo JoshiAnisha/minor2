@@ -25,7 +25,7 @@ class ServiceRequestController extends Controller
         $user = Auth::user();
         $caregiver = $user->caregiver;
         if (!$caregiver && $user->role === 'caregiver') {
-            $caregiver = \App\Models\Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id]);
+            $caregiver = \App\Models\Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
         }
         $rejectedIds = $caregiver
             ? ServiceRequestRejection::where('caregiver_id', $caregiver->id)->pluck('service_request_id')

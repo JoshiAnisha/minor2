@@ -3,7 +3,7 @@
 @section('title', 'Assign Service to Patient')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid px-0">
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('admin.assigned-services.index') }}">Assigned Services</a></li>

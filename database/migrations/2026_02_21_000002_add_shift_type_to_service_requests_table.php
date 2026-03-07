@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('service_requests', 'shift_type')) {
+            return;
+        }
         Schema::table('service_requests', function (Blueprint $table) {
             $table->string('shift_type')->nullable()->after('status');
         });

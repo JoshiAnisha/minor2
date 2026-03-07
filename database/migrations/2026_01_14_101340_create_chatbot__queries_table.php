@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('chatbot_queries')) {
+            return;
+        }
         Schema::create('chatbot_queries', function (Blueprint $table) {
             $table->id();
             $table->text('question');

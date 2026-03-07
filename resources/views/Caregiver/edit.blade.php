@@ -194,6 +194,36 @@
         </form>
     </div>
 
+    {{-- Reviews section --}}
+    <div class="card shadow-sm p-4 mt-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-star me-2"></i>My Reviews</h5>
+        @if(isset($reviews) && $reviews->isNotEmpty())
+            <div class="list-group list-group-flush">
+                @foreach($reviews as $review)
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="text-warning">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
+                                @endfor
+                            </span>
+                            <span class="fw-medium ms-2">
+                                {{ optional(optional(optional($review->booking)->patient)->user)->name ?? 'Patient' }}
+                                @if($review->booking && $review->booking->service)
+                                    <span class="text-muted small"> · {{ $review->booking->service->name }}</span>
+                                @endif
+                            </span>
+                            <p class="mb-0 mt-1 small text-muted">{{ $review->comment }}</p>
+                        </div>
+                        <small class="text-muted">{{ optional($review->created_at)->format('d M Y') }}</small>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-muted mb-0">You haven’t written any reviews yet. Complete a booking to review a patient.</p>
+        @endif
+    </div>
+
     {{-- Profile Photo Preview Script --}}
     <script>
         document.getElementById('fileInput').addEventListener('change', function(e) {

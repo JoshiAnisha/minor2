@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('caregivers')) {
+            return;
+        }
         Schema::create('caregivers', function (Blueprint $table) {
          $table->id();
         $table->enum('caregiver_type', ['medical', 'regular'])->nullable();

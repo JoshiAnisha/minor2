@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Caregiver;
 use App\Models\User;
-
+use App\Models\Review;
 
 class ProfileController extends Controller
  {
@@ -20,10 +20,10 @@ class ProfileController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // ✅ FIXED: users_id
         $caregiver = Caregiver::firstOrNew(['users_id' => $user->id]);
+        $reviews = Review::where('user_id', $user->id)->with(['booking.patient.user', 'booking.service'])->latest()->take(15)->get();
 
-        return view('Caregiver.edit', compact('user', 'caregiver'));
+        return view('Caregiver.edit', compact('user', 'caregiver', 'reviews'));
     }
  
     public function update(Request $request)

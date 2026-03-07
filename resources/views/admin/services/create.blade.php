@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-0">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
                 <h3 class="mb-0">Create New Service</h3>
@@ -50,6 +50,33 @@
                         @error('service_type')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <input type="text"
+                            class="form-control @error('category') is-invalid @enderror"
+                            id="category"
+                            name="category"
+                            value="{{ old('category') }}"
+                            list="category-list"
+                            placeholder="Choose existing or type a new category">
+                        <datalist id="category-list">
+                            @foreach ($existingCategories ?? [] as $cat)
+                                <option value="{{ $cat }}">
+                            @endforeach
+                        </datalist>
+                        <small class="form-text text-muted">Select from the list or type a new category name.</small>
+                        @error('category')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="hidden" name="is_long_term" value="0">
+                        <input type="checkbox" class="form-check-input" id="is_long_term" name="is_long_term" value="1" {{ old('is_long_term') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_long_term">Available for long-term booking</label>
+                        <small class="form-text text-muted d-block">Check for services that can be taken on an ongoing basis (e.g. nursing, elderly care, physiotherapy).</small>
                     </div>
 
                     <div class="mb-3">

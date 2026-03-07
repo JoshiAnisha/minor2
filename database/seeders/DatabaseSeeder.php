@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AdminSeeder::class);
         $this->call(CustomServiceSeeder::class);
+        $this->call(SewaCareServicesSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

@@ -13,6 +13,7 @@
 
     <style>
         body { font-family: 'Poppins', sans-serif; background: #e0f2fe; }
+        .caregiver-main-content { margin-left: 260px; min-height: 100vh; }
         .btn-primary, .btn-info { background-color: #0ea5e9; border-color: #0ea5e9; }
         .btn-primary:hover, .btn-info:hover { background-color: #0284c7; border-color: #0284c7; }
     </style>
@@ -21,15 +22,12 @@
 </head>
 
 <body>
-    <div class="d-flex min-vh-100">
-        @include('Caregiver.layouts.sidebar')
-
-        <main class="flex-grow-1 overflow-auto">
-            <div class="p-4">
-                @yield('content')
-            </div>
-        </main>
-    </div>
+    @include('Caregiver.layouts.sidebar')
+    <main class="caregiver-main-content">
+        <div class="p-4">
+            @yield('content')
+        </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')

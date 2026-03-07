@@ -9,8 +9,12 @@ class Caregiver extends Model
 {
     use HasFactory;
 
+    /** New caregivers are active by default (not pending). */
+    protected $attributes = [
+        'availability_status' => true,
+    ];
+
     protected $fillable = [
-        'user_id',
         'users_id',
         'address',
         'skills',
@@ -27,7 +31,7 @@ class Caregiver extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'users_id');
     }
 
     public function rejectedServiceRequests()

@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-0">
         <div class="mb-3">
             <a href="{{ route('admin.services.index') }}" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left me-1"></i> Back to services</a>
         </div>
@@ -19,6 +19,20 @@
 
                     <dt class="col-sm-3">Service type</dt>
                     <dd class="col-sm-9"><span class="badge bg-secondary">{{ ucfirst($service->service_type) }}</span></dd>
+
+                    @if(!empty($service->category))
+                    <dt class="col-sm-3">Category</dt>
+                    <dd class="col-sm-9">{{ $service->category }}</dd>
+                    @endif
+
+                    <dt class="col-sm-3">Duration</dt>
+                    <dd class="col-sm-9">
+                        @if($service->is_long_term ?? false)
+                            <span class="badge bg-info">Long-term</span>
+                        @else
+                            One-time / Short-term
+                        @endif
+                    </dd>
 
                     <dt class="col-sm-3">Base price</dt>
                     <dd class="col-sm-9">{{ number_format($service->base_price, 2) }}</dd>

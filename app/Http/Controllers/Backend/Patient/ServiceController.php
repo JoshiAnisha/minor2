@@ -22,7 +22,9 @@ class ServiceController extends Controller
             ->where(function ($q) use ($today) {
                 $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
             })
-            ->orderBy('name')->get();
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
         return view('backend.patient.services.index', compact('services'));
     }
 

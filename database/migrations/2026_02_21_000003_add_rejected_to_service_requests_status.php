@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 return new class extends Migration
 {
@@ -9,9 +10,12 @@ return new class extends Migration
     {
         $driver = DB::getDriverName();
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE service_requests MODIFY COLUMN status ENUM('pending', 'accepted', 'rejected', 'completed') DEFAULT 'pending'");
+            try {
+                DB::statement("ALTER TABLE service_requests MODIFY COLUMN status ENUM('pending', 'accepted', 'rejected', 'completed') DEFAULT 'pending'");
+            } catch (QueryException $e) {
+                // Already applied - skip
+            }
         }
-        // SQLite and others: status is stored as string, 'rejected' will work
     }
 
     public function down(): void

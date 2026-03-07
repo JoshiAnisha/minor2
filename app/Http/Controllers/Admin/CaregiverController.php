@@ -4,25 +4,37 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Caregiver;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CaregiverController extends Controller
 {
     public function index()
-{
-    $totalCaregivers = Caregiver::count();
-    $activeCaregivers = Caregiver::where('availability_status', 1)->count();
-    $pendingCaregivers = Caregiver::where('availability_status', 0)->count();
+    {
+        // Ensure every user with role=caregiver has a caregiver profile row (DB: caregivers.users_id -> users.id)
+        User::where('role', 'caregiver')->get()->each(function (User $user) {
+            if (Caregiver::where('users_id', $user->id)->doesntExist()) {
+                Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
+            }
+        });
 
-    $caregivers = Caregiver::with('user')->latest()->get(); // already fetching all fields
+        // Only list caregivers whose user has role = 'caregiver' (exclude admin, patient, etc.)
+        $caregivers = Caregiver::with('user')
+            ->whereHas('user', fn ($q) => $q->where('role', 'caregiver'))
+            ->orderByDesc('id')
+            ->get();
 
-    return view('admin.caregiver', compact(
-        'totalCaregivers',
-        'activeCaregivers',
-        'pendingCaregivers',
-        'caregivers'
-    ));
-}
+        $totalCaregivers = $caregivers->count();
+        $activeCaregivers = $caregivers->where('availability_status', true)->count();
+        $pendingCaregivers = $totalCaregivers - $activeCaregivers;
+
+        return view('admin.caregiver', compact(
+            'totalCaregivers',
+            'activeCaregivers',
+            'pendingCaregivers',
+            'caregivers'
+        ));
+    }
 
 
     // 🔹 Edit page

@@ -6,26 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        if (Schema::hasColumn('services', 'created_at')) {
-            return;
-        }
         Schema::table('services', function (Blueprint $table) {
-            $table->timestamps();
+            if (!Schema::hasColumn('services', 'category')) {
+                $table->string('category')->nullable()->after('service_type');
+            }
+            if (!Schema::hasColumn('services', 'is_long_term')) {
+                $table->boolean('is_long_term')->default(false)->after('category');
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->dropTimestamps();
+            $table->dropColumn(['category', 'is_long_term']);
         });
     }
 };

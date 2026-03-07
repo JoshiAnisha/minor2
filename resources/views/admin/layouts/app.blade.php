@@ -12,15 +12,16 @@
 
     <!-- Custom CSS (optional) -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        .admin-main-content { margin-left: 260px; min-height: 100vh; width: calc(100% - 260px); }
+    </style>
 </head>
 
 <body>
-    <div class="d-flex">
-        <!-- Sidebar -->
-        @include('admin.layouts.sidebar')
-
-        <!-- Main Content -->
-        <div class="flex-grow-1 p-4" style="width: 100%;">
+    @include('admin.layouts.sidebar')
+    <!-- Main Content -->
+    <div class="admin-main-content">
+        <div class="p-4">
             @yield('content')
         </div>
     </div>

@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('task_logs')) {
+            return;
+        }
         Schema::create('task_logs', function (Blueprint $table) {
             $table->id();
             $table->timestamp('created at')->useCurrent();

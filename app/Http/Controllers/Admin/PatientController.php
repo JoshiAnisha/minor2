@@ -4,19 +4,29 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
     public function index()
     {
-        // Fetch all patients with related user
-        $patients = Patient::with('user')->orderBy('id', 'desc')->get();
+        // Ensure every user with role=patient has a patient profile row (DB: patients.user_id -> users.id)
+        User::where('role', 'patient')->get()->each(function (User $user) {
+            if (Patient::where('user_id', $user->id)->doesntExist()) {
+                Patient::create(Patient::defaultAttributesForCreate($user->id));
+            }
+        });
 
-        // Counts
+        // Only list patients whose user has role = 'patient' (exclude admin, caregiver, etc.)
+        $patients = Patient::with('user')
+            ->whereHas('user', fn ($q) => $q->where('role', 'patient'))
+            ->orderByDesc('id')
+            ->get();
+
         $totalPatients = $patients->count();
-        $activePatients = $patients->where('user.role', 'patient')->count();
-        $pendingPatients = $totalPatients - $activePatients;
+        $activePatients = $patients->count(); // All listed patients are active (have user.role = patient)
+        $pendingPatients = 0;
 
         return view('admin.patient', compact(
             'patients',

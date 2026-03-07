@@ -1,24 +1,9 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3 col-lg-2 sidebar p-3">
-                <div class="mb-4">
-                    <a href="{{ route('admin.dashboard') }}">
-                        <img src="{{ asset('frontend/images/logo.png') }}" alt="SewaCare Logo" class="img-fluid logo-img">
-                    </a>
-                </div>
-                <nav class="nav flex-column">
-                    <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                    <a class="nav-link" href="{{ route('admin.appointment') }}">Appointments</a>
-                    <a class="nav-link active" href="{{ route('admin.patient') }}">Patients</a>
-                    <a class="nav-link" href="{{ route('admin.caregiver') }}">Caregivers</a>
-                    <a class="nav-link" href="{{ route('admin.feedback') }}">Feedback</a>
-                </nav>
-            </div>
-
-            <div class="col-md-9 col-lg-10 p-4">
+    <div class="container-fluid px-0">
+        <div class="row g-0">
+            <div class="col-12">
                 <h2 class="mb-4">Edit Patient Details</h2>
 
                 @if (session('success'))

@@ -7,6 +7,17 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## SewaCare – Quick start
+
+1. **Environment**: Copy `.env.example` to `.env`, then run `php artisan key:generate`.
+2. **Database**: Create a MySQL database named `sewacare` (or set `DB_DATABASE` in `.env`). Run `php artisan migrate`.
+3. **Storage link**: Run `php artisan storage:link` (for profile photos and uploads).
+4. **Run the app**:
+   - **Option A**: `composer run dev` (starts PHP server, queue, logs, and Vite).
+   - **Option B**: Use XAMPP (point document root to `public/`) and run `php artisan serve` (or use Apache), then in another terminal `npm run dev` for assets.
+
+Homepage: `/` · Login: `/auth/login` · Register: `/auth/register`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Invoice;
+use App\Models\Patient;
 use App\Models\Service;
+use App\Models\ServiceRequest;
 
 class DashboardController extends Controller
 {
@@ -26,15 +28,18 @@ class DashboardController extends Controller
             return redirect()->route('backend.auth.login')->withErrors(['error' => 'User not found.']);
         }
 
+        // Ensure patient profile exists for this user (patients.user_id -> users.id)
+        if ($user->role === 'patient' && !$user->patient) {
+            Patient::create(Patient::defaultAttributesForCreate($user->id));
+            $user->load('patient');
+        }
         $patient = $user->patient;
 
         try {
             $totalBookings = $patient
                 ? Booking::where('patients_id', $patient->id)->count()
                 : 0;
-            $upcomingServices = $patient
-                ? Booking::where('patients_id', $patient->id)->whereIn('status', ['pending', 'accepted'])->whereDate('date_time', '>=', now())->count()
-                : 0;
+            $myRequestsCount = ServiceRequest::where('patient_id', $user->id)->count();
             $totalInvoices = Invoice::where('user_id', $user->id)->count();
 
             $latestBookings = $patient
@@ -54,7 +59,7 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             // If there's an error, set defaults
             $totalBookings = 0;
-            $upcomingServices = 0;
+            $myRequestsCount = 0;
             $totalInvoices = 0;
             $latestBookings = collect([]);
             $availableServices = collect([]);
@@ -62,7 +67,7 @@ class DashboardController extends Controller
 
         return view('backend.patient.dashboard.index', compact(
             'totalBookings',
-            'upcomingServices',
+            'myRequestsCount',
             'totalInvoices',
             'latestBookings',
             'availableServices'

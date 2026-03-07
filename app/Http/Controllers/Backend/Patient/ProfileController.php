@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Backend\Patient;
  use Illuminate\Support\Facades\Auth;
  use Illuminate\Support\Facades\Storage;
  use App\Models\Patient;
+ use App\Models\Review;
 
 class ProfileController extends Controller
 {
@@ -14,8 +15,9 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $patient = $user->patient;
+        $reviews = Review::where('user_id', $user->id)->with('service')->latest()->take(15)->get();
 
-        return view('backend.patient.profile.show', compact('user', 'patient'));
+        return view('backend.patient.profile.show', compact('user', 'patient', 'reviews'));
     }
 
     public function edit()

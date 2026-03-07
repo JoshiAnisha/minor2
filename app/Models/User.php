@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     public function caregiver()
     {
-        return $this->hasOne(Caregiver::class);
+        return $this->hasOne(Caregiver::class, 'users_id');
     }
 
     public function bookings()

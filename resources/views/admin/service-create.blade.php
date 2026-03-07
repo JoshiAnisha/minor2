@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-0">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
                 <h3 class="mb-0">Create New Service</h3>

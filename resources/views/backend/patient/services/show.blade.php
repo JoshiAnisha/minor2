@@ -9,9 +9,18 @@
 
 <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
     <div class="card-body p-4">
+        @if(!empty($service->category))
+            <p class="small text-muted text-uppercase fw-semibold mb-1">{{ $service->category }}</p>
+        @endif
         <h2 class="h5 fw-bold mb-2">{{ $service->name }}</h2>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge bg-light text-dark">{{ ucfirst($service->service_type ?? 'regular') }}</span>
+            @if ($service->is_long_term ?? false)
+                <span class="badge bg-info">Long-term</span>
+            @endif
+        </div>
         @if(!empty($service->details))
-            <p class="text-muted small mb-2">{{ $service->details }}</p>
+            <div class="text-muted small mb-3" style="white-space: pre-line;">{{ $service->details }}</div>
         @endif
         <p class="fw-bold text-primary mb-0">Rs {{ number_format((float) ($service->base_price ?? 0), 0) }}</p>
     </div>

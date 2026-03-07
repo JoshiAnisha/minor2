@@ -37,14 +37,11 @@ class AuthController extends Controller
         ]);
 
         if ($request->role === 'patient') {
-            Patient::create([
-                'user_id' => $user->id,
-                'email' => $user->email,
-            ]);
+            Patient::create(Patient::defaultAttributesForCreate($user->id));
         } elseif ($request->role === 'caregiver') {
             Caregiver::create([
-                'user_id' => $user->id,
                 'users_id' => $user->id,
+                'availability_status' => true,
             ]);
         }
 

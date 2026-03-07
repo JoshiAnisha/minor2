@@ -8,8 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('services', 'start_date')) {
+            return;
+        }
         Schema::table('services', function (Blueprint $table) {
-            $table->date('start_date')->nullable()->after('service_type');
+            if (Schema::hasColumn('services', 'service_type')) {
+                $table->date('start_date')->nullable()->after('service_type');
+            } else {
+                $table->date('start_date')->nullable();
+            }
             $table->date('end_date')->nullable()->after('start_date');
         });
     }

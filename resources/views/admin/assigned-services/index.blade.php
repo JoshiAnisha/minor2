@@ -3,7 +3,7 @@
 @section('title', 'Assigned Services')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid px-0">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="mb-1"><i class="bi bi-journal-plus me-2"></i>Assigned Services</h2>

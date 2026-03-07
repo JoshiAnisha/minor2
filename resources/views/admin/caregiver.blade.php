@@ -49,9 +49,9 @@
 
     <body>
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-9 col-lg-10 p-4">
+        <div class="container-fluid px-0">
+            <div class="row g-0">
+                <div class="col-12">
                     <h2 class="mb-4">Caregiver Management</h2>
                     <div class="row g-4 mb-4">
                         <div class="col-md-4">
@@ -98,11 +98,11 @@
                                 @forelse ($caregivers as $index => $caregiver)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $caregiver->user->name ?? 'N/A' }}</td>
-                                        <td>{{ ucfirst($caregiver->caregiver_type) ?? 'N/A' }}</td>
+                                        <td>{{ $caregiver->user?->name ?? 'N/A' }}</td>
+                                        <td>{{ $caregiver->caregiver_type ? ucfirst($caregiver->caregiver_type) : 'N/A' }}</td>
                                         <td>{{ $caregiver->qualification ?? 'N/A' }}</td>
                                         <td>{{ $caregiver->experience ?? 'N/A' }}</td>
-                                        <td>{{ $caregiver->contact_number ?? 'N/A' }}</td>
+                                        <td>{{ $caregiver->user?->contact_number ?? $caregiver->user?->email ?? 'N/A' }}</td>
                                         <td>{{ $caregiver->skills ?? 'N/A' }}</td>
 
                                         <td>{{ $caregiver->background_check_status ? 'Passed' : 'Pending' }}</td>

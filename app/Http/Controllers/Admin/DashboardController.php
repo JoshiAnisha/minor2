@@ -21,21 +21,18 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        // Key Metrics
-        $totalPatients = Patient::count();
-        // Count active caregivers (availability_status = 1 or true, not null)
-        $totalCaregivers = Caregiver::where(function($query) {
-            $query->where('availability_status', 1)
-                  ->orWhere('availability_status', true);
-        })->count();
+        // Key metrics: only count by role so admin/other users are excluded
+        $totalPatients = Patient::whereHas('user', fn ($q) => $q->where('role', 'patient'))->count();
+        // Total caregivers = all users with role 'caregiver' (fetched from caregivers table)
+        $totalCaregivers = Caregiver::whereHas('user', fn ($q) => $q->where('role', 'caregiver'))->count();
         $totalServices = Service::count();
 
-        // Bookings by status for chart
+        // Bookings by status (bookings.status enum: pending, accepted, completed, cancelled)
         $bookingsByStatus = [
-            'pending' => Booking::where('status', 'pending')->count(),
+            'pending'   => Booking::where('status', 'pending')->count(),
             'in_process' => Booking::where('status', 'accepted')->count(),
-            'completed' => Booking::where('status', 'completed')->count(),
-            'cancelled' => Booking::where('status', 'cancelled')->count(),
+            'completed'  => Booking::where('status', 'completed')->count(),
+            'cancelled'  => Booking::where('status', 'cancelled')->count(),
         ];
 
         // Prepare data for Chart.js

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-3">
-    <a href="{{ route('patient.dashboard') }}" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left me-1"></i> Dashboard</a>
+    <a href="{{ route('patient.services.index') }}" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left me-1"></i> Back to Services</a>
 </div>
 
 <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">

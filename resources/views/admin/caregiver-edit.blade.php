@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-0">
         <h3>Edit Caregiver</h3>
 
         <form action="{{ route('admin.caregivers.update', $caregiver) }}" method="POST">

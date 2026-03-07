@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Bid;
 use App\Models\ServiceRequest;
-use App\Models\Service;
 
 class CaregiverController extends Controller
 {
@@ -16,7 +15,7 @@ class CaregiverController extends Controller
         $user = Auth::user();
         $caregiver = $user->caregiver;
         if (!$caregiver && $user->role === 'caregiver') {
-            $caregiver = \App\Models\Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id]);
+            $caregiver = \App\Models\Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
         }
         if (!$caregiver) {
             $pendingServiceRequests = ServiceRequest::with('user', 'service')
@@ -24,24 +23,16 @@ class CaregiverController extends Controller
                 ->latest()
                 ->take(5)
                 ->get();
-            $today = now()->toDateString();
-            $availableServices = Service::where(function ($q) use ($today) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
-            })->where(function ($q) use ($today) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
-            })->orderBy('name')->get();
             return view('Caregiver.dashboard', [
                 'upcomingVisits' => 0,
                 'tasksToLog' => 0,
                 'completedBookings' => 0,
-                'averageRating' => 0,
                 'todaysBookings' => collect(),
                 'pendingCount' => 0,
                 'inProgressCount' => 0,
                 'completedCount' => 0,
                 'pendingServiceRequests' => $pendingServiceRequests,
                 'weeklyBookings' => [0, 0, 0, 0, 0, 0, 0],
-                'availableServices' => $availableServices,
             ]);
         }
         $caregiverId = $caregiver->id;
@@ -61,9 +52,6 @@ class CaregiverController extends Controller
         $completedBookings = Booking::where('caregivers_id', $caregiverId)
                                     ->where('status', 'completed')
                                     ->count();
-
-        // Average rating (replace with real rating logic later)
-        $averageRating = 4.8;
 
         // Today's bookings
         $todaysBookings = Booking::with(['patient.user', 'service'])
@@ -97,25 +85,16 @@ class CaregiverController extends Controller
                 ->count();
         }
 
-        $today = now()->toDateString();
-        $availableServices = Service::where(function ($q) use ($today) {
-            $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
-        })->where(function ($q) use ($today) {
-            $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
-        })->orderBy('name')->get();
-
         return view('Caregiver.dashboard', compact(
             'upcomingVisits',
             'tasksToLog',
             'completedBookings',
-            'averageRating',
             'todaysBookings',
             'pendingCount',
             'inProgressCount',
             'completedCount',
             'pendingServiceRequests',
-            'weeklyBookings',
-            'availableServices'
+            'weeklyBookings'
         ));
     }
 }

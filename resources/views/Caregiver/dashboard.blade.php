@@ -2,27 +2,47 @@
 
 @section('content')
 <style>
-    .dashboard-header { margin-bottom: 2rem; }
+    .dashboard-header { margin-bottom: 1.75rem; }
+    .dashboard-header h1 { font-size: 1.4rem; font-weight: 600; color: #0f172a; }
+    .dashboard-header p { color: #64748b; font-size: 0.9rem; }
     .stat-card {
-        border-radius: 16px;
-        border: none;
-        padding: 1.5rem;
-        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem;
+        transition: box-shadow 0.2s;
+        background: #fff;
     }
-    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
-    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; }
     .quick-card {
-        border-radius: 16px;
-        border: none;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
         text-decoration: none;
-        color: inherit;
-        padding: 1.5rem;
+        color: #334155;
+        padding: 1.25rem;
         transition: all 0.2s;
         display: block;
+        background: #fff;
     }
-    .quick-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.1); color: inherit; }
-    .section-card { border-radius: 16px; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .chart-container { position: relative; height: 280px; }
+    .quick-card:hover { border-color: #0ea5e9; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); color: #0ea5e9; }
+    .section-card {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        background: #fff;
+        overflow: hidden;
+    }
+    .section-card .card-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .section-card .card-title { font-size: 0.95rem; font-weight: 600; color: #0f172a; }
+    .chart-container { position: relative; height: 240px; }
+    .booking-legend { max-width: 160px; }
 </style>
 
 <div class="dashboard-header">
@@ -32,7 +52,7 @@
 
 {{-- Stats Row --}}
 <div class="row g-4 mb-4">
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-sm-6 col-lg-4">
         <div class="card stat-card shadow-sm">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -45,7 +65,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-sm-6 col-lg-4">
         <div class="card stat-card shadow-sm">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -58,7 +78,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-sm-6 col-lg-4">
         <div class="card stat-card shadow-sm">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -71,58 +91,12 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card stat-card shadow-sm">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <p class="text-muted small mb-1">My Rating</p>
-                    <h3 class="fw-bold mb-0">{{ $averageRating ?? '—' }} <i class="bi bi-star-fill text-warning small"></i></h3>
-                </div>
-                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                    <i class="bi bi-star"></i>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="row g-4">
-    {{-- Left: Charts + Quick Links --}}
+    {{-- Left column --}}
     <div class="col-lg-8">
-        {{-- Booking Status Pie Chart --}}
-        <div class="card section-card mb-4">
-            <div class="card-body">
-                <h5 class="card-title fw-bold mb-4">Booking Overview</h5>
-                <div class="row align-items-center">
-                    <div class="col-md-5">
-                        <div class="chart-container">
-                            <canvas id="bookingsPieChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-7">
-                        <div class="d-flex flex-column gap-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="rounded-circle" style="width:12px;height:12px;background:#3b82f6;"></span>
-                                <span>Pending</span>
-                                <strong class="ms-auto">{{ $pendingCount ?? 0 }}</strong>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="rounded-circle" style="width:12px;height:12px;background:#06b6d4;"></span>
-                                <span>In Progress</span>
-                                <strong class="ms-auto">{{ $inProgressCount ?? 0 }}</strong>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="rounded-circle" style="width:12px;height:12px;background:#22c55e;"></span>
-                                <span>Completed</span>
-                                <strong class="ms-auto">{{ $completedCount ?? 0 }}</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Quick Actions --}}
+        {{-- Quick Actions – primary actions first --}}
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
                 <a href="{{ route('caregiver.bookings') }}" class="card quick-card shadow-sm text-center">
@@ -156,11 +130,50 @@
             </div>
         </div>
 
-        {{-- New Service Requests --}}
+        {{-- Booking Overview – summary --}}
+        <div class="card section-card mb-4">
+            <div class="card-header">Booking Overview</div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-5">
+                        <div class="chart-container">
+                            <canvas id="bookingsPieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="d-flex flex-column gap-2 booking-legend">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-2">
+                                    <span class="rounded-circle" style="width:10px;height:10px;background:#3b82f6;"></span>
+                                    <span class="small">Pending</span>
+                                </span>
+                                <strong class="small">{{ $pendingCount ?? 0 }}</strong>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-2">
+                                    <span class="rounded-circle" style="width:10px;height:10px;background:#06b6d4;"></span>
+                                    <span class="small">In Progress</span>
+                                </span>
+                                <strong class="small">{{ $inProgressCount ?? 0 }}</strong>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-2">
+                                    <span class="rounded-circle" style="width:10px;height:10px;background:#22c55e;"></span>
+                                    <span class="small">Completed</span>
+                                </span>
+                                <strong class="small">{{ $completedCount ?? 0 }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- New Service Requests – action list --}}
         <div class="card section-card">
-            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">New Service Requests</h5>
-                <a href="{{ route('caregiver.service.requests') }}" class="btn btn-sm text-decoration-none" style="color: #0ea5e9;">View all</a>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>New Service Requests</span>
+                <a href="{{ route('caregiver.service.requests') }}" class="btn btn-sm btn-outline-primary py-0">View all</a>
             </div>
             <div class="card-body p-0">
                 @if(isset($pendingServiceRequests) && $pendingServiceRequests->isNotEmpty())
@@ -199,23 +212,25 @@
         </div>
     </div>
 
-    {{-- Right: Today's Bookings + Bar Chart --}}
+    {{-- Right column: Today first, then context --}}
     <div class="col-lg-4">
+        {{-- Today's Bookings – top priority --}}
         <div class="card section-card mb-4">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 fw-bold">Today’s Bookings</h5>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Today’s Bookings</span>
+                <a href="{{ route('caregiver.bookings') }}" class="btn btn-sm btn-link text-decoration-none p-0 text-primary">View all</a>
             </div>
             <div class="card-body p-0">
                 @if(isset($todaysBookings) && $todaysBookings->isNotEmpty())
                     <ul class="list-group list-group-flush">
                         @foreach($todaysBookings as $booking)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
                                 <div>
-                                    <strong>{{ optional(optional($booking->patient)->user)->name ?? 'N/A' }}</strong>
+                                    <strong class="small">{{ optional(optional($booking->patient)->user)->name ?? 'N/A' }}</strong>
                                     <br><small class="text-muted">{{ optional($booking->service)->name ?? '-' }}</small>
                                 </div>
                                 <div class="text-end">
-                                    <span>{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('h:i A') : '-' }}</span>
+                                    <span class="small">{{ $booking->date_time ? \Carbon\Carbon::parse($booking->date_time)->format('h:i A') : '-' }}</span>
                                     <br>
                                     @if ($booking->status === 'pending')
                                         <span class="badge bg-warning text-dark">Pending</span>
@@ -229,54 +244,35 @@
                         @endforeach
                     </ul>
                 @else
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-calendar-x fs-1"></i>
-                        <p class="mb-0 mt-2">No bookings today</p>
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-calendar-x d-block fs-4 mb-2"></i>
+                        <p class="mb-0">No bookings today</p>
                     </div>
                 @endif
             </div>
         </div>
 
-        {{-- Available services (opened by admin – patients request these; you see them in Service Requests) --}}
-        <div class="card section-card mb-4">
-            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">Available Services</h5>
-                <a href="{{ route('caregiver.service.requests') }}" class="btn btn-sm text-decoration-none" style="color: #0ea5e9;">Respond to requests</a>
-            </div>
-            <div class="card-body p-0">
-                @if(isset($availableServices) && $availableServices->isNotEmpty())
-                    <ul class="list-group list-group-flush">
-                        @foreach($availableServices->take(5) as $s)
-                            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                                <span><strong>{{ $s->name }}</strong></span>
-                                <span class="badge bg-secondary">{{ ucfirst($s->service_type) }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                    @if($availableServices->count() > 5)
-                        <div class="text-center py-2 border-top">
-                            <small class="text-muted">+ {{ $availableServices->count() - 5 }} more</small>
-                        </div>
-                    @endif
-                    <p class="small text-muted px-3 pt-2 mb-0">When patients request these services, they appear under <strong>Service Requests</strong>.</p>
-                @else
-                    <div class="text-center py-4 text-muted">
-                        <i class="bi bi-bag fs-1"></i>
-                        <p class="mb-0 mt-2 small">No services opened yet</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        {{-- Bar Chart: Weekly Activity --}}
+        {{-- Quick tips – suits dashboard --}}
         <div class="card section-card">
-            <div class="card-body">
-                <h5 class="card-title fw-bold mb-4">This Week</h5>
-                <div class="chart-container">
-                    <canvas id="weeklyBarChart"></canvas>
-                </div>
+            <div class="card-header">Quick tips</div>
+            <div class="card-body py-3">
+                <ul class="list-unstyled mb-0 small text-muted">
+                    <li class="d-flex align-items-start mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <span>Log tasks after each visit to keep records up to date.</span>
+                    </li>
+                    <li class="d-flex align-items-start mb-2">
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <span>Respond to service requests to get matched with more bookings.</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+                        <span>Keep your schedule updated so patients can book you easily.</span>
+                    </li>
+                </ul>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -284,53 +280,28 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const pending = {{ $pendingCount ?? 0 }};
+    const inProgress = {{ $inProgressCount ?? 0 }};
+    const completed = {{ $completedCount ?? 0 }};
+    const total = pending + inProgress + completed;
+
     const pieCtx = document.getElementById('bookingsPieChart');
     if (pieCtx) {
         new Chart(pieCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Pending', 'In Progress', 'Completed'],
+                labels: total > 0 ? ['Pending', 'In Progress', 'Completed'] : ['No bookings yet'],
                 datasets: [{
-                    data: [{{ $pendingCount ?? 0 }}, {{ $inProgressCount ?? 0 }}, {{ $completedCount ?? 0 }}],
-                    backgroundColor: ['#3b82f6', '#06b6d4', '#22c55e'],
+                    data: total > 0 ? [pending, inProgress, completed] : [1],
+                    backgroundColor: total > 0 ? ['#3b82f6', '#06b6d4', '#22c55e'] : ['#e2e8f0'],
                     borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
+                plugins: { legend: { display: false } },
                 cutout: '65%'
-            }
-        });
-    }
-
-    const barCtx = document.getElementById('weeklyBarChart');
-    if (barCtx) {
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: days,
-                datasets: [{
-                    label: 'Bookings',
-                    data: [{{ implode(',', $weeklyBookings ?? [0,0,0,0,0,0,0]) }}],
-                    backgroundColor: 'rgba(14, 165, 233, 0.6)',
-                    borderColor: 'rgb(14, 165, 233)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                }
             }
         });
     }

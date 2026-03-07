@@ -19,7 +19,7 @@ class CaregiverBookingController extends Controller
         $user = Auth::user();
         $caregiver = $user->caregiver;
         if (!$caregiver && $user->role === 'caregiver') {
-            $caregiver = \App\Models\Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id]);
+            $caregiver = \App\Models\Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
         }
         if (!$caregiver) {
             return redirect()->route('caregiver.dashboard')->with('error', 'Caregiver profile not found.');

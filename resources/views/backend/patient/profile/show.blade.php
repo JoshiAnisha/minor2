@@ -75,6 +75,35 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Reviews section --}}
+            <div class="mt-4">
+                <div class="profile-section rounded-3 p-4">
+                    <h5 class="profile-section-title mb-3"><i class="bi bi-star me-2"></i>My Reviews</h5>
+                    @if(isset($reviews) && $reviews->isNotEmpty())
+                        <div class="list-group list-group-flush">
+                            @foreach($reviews as $review)
+                                <div class="list-group-item px-0 d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <span class="text-warning">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
+                                            @endfor
+                                        </span>
+                                        <span class="fw-medium ms-2">{{ $review->service->name ?? 'Service' }}</span>
+                                        <p class="mb-0 mt-1 small text-muted">{{ $review->comment }}</p>
+                                    </div>
+                                    <small class="text-muted">{{ optional($review->created_at)->format('d M Y') }}</small>
+                                </div>
+                            @endforeach
+                        </div>
+                        <a href="{{ route('patient.reviews.index') }}" class="btn btn-outline-primary btn-sm mt-3">View all reviews</a>
+                    @else
+                        <p class="text-muted mb-0">You haven’t written any reviews yet.</p>
+                        <a href="{{ route('patient.reviews.create') }}" class="btn btn-primary btn-sm mt-2">Write a review</a>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 </div>

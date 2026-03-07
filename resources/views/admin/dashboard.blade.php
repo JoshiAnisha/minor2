@@ -1,9 +1,9 @@
 @extends('admin.layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-9 col-lg-10 p-4">
+    <div class="container-fluid px-0">
+        <div class="row g-0">
+            <div class="col-12">
                 <h2 class="mb-4">Welcome, {{ Auth::user()->name }}!</h2>
 
                 {{-- Key Metrics Section --}}
@@ -25,7 +25,7 @@
                         <div class="card shadow-sm p-4 border-start border-info border-5">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="text-muted mb-2">Active Caregivers</h6>
+                                    <h6 class="text-muted mb-2">Total Caregivers</h6>
                                     <h2 class="mb-0">{{ $totalCaregivers }}</h2>
                                 </div>
                                 <div class="text-info" style="font-size: 3rem; opacity: 0.3;">
@@ -51,15 +51,28 @@
 
                 {{-- Charts Section --}}
                 <div class="row g-4 mb-5">
-                    <div class="col-md-12">
-                        <div class="card shadow-sm p-4">
-                            <h5 class="mb-4">Bookings by Status</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <canvas id="bookingsChart" style="max-height: 300px;"></canvas>
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h6 class="mb-0 fw-semibold text-dark">Bookings by Status</h6>
+                                <small class="text-muted">Distribution overview</small>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="chart-container" style="position: relative; height: 280px;">
+                                    <canvas id="bookingsChart"></canvas>
                                 </div>
-                                <div class="col-md-6">
-                                    <canvas id="bookingsBarChart" style="max-height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h6 class="mb-0 fw-semibold text-dark">Bookings Count</h6>
+                                <small class="text-muted">By status</small>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="chart-container" style="position: relative; height: 280px;">
+                                    <canvas id="bookingsBarChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -127,73 +140,105 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <script>
-        // Pie Chart - Bookings by Status
-        const pieCtx = document.getElementById('bookingsChart');
-        if (pieCtx) {
-            new Chart(pieCtx, {
-                type: 'pie',
-                data: {
-                    labels: @json($chartLabels),
-                    datasets: [{
-                        label: 'Bookings',
-                        data: @json($chartData),
-                        backgroundColor: @json($chartColors),
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Bookings Distribution (Pie Chart)'
-                        }
-                    }
-                }
-            });
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartLabels = @json($chartLabels);
+            const chartData = @json($chartData);
+            const colors = {
+                pending: 'rgba(245, 158, 11, 0.85)',
+                inProcess: 'rgba(14, 165, 233, 0.85)',
+                completed: 'rgba(22, 163, 74, 0.85)',
+                cancelled: 'rgba(225, 29, 72, 0.85)'
+            };
+            const bgColors = [colors.pending, colors.inProcess, colors.completed, colors.cancelled];
+            const borderColors = ['#d97706', '#0284c7', '#16a34a', '#dc2626'];
 
-        // Bar Chart - Bookings by Status
-        const barCtx = document.getElementById('bookingsBarChart');
-        if (barCtx) {
-            new Chart(barCtx, {
-                type: 'bar',
-                data: {
-                    labels: @json($chartLabels),
-                    datasets: [{
-                        label: 'Number of Bookings',
-                        data: @json($chartData),
-                        backgroundColor: @json($chartColors),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
+            // Doughnut Chart - Bookings by Status
+            const pieCtx = document.getElementById('bookingsChart');
+            if (pieCtx) {
+                new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: bgColors,
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            hoverOffset: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '55%',
+                        layout: { padding: 12 },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    font: { size: 12, family: "'Inter', sans-serif" }
+                                }
                             }
                         }
+                    }
+                });
+            }
+
+            // Bar Chart - Bookings by Status
+            const barCtx = document.getElementById('bookingsBarChart');
+            if (barCtx) {
+                new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Bookings',
+                            data: chartData,
+                            backgroundColor: bgColors,
+                            borderColor: borderColors,
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: 12 },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0,0,0,0.06)' },
+                                ticks: {
+                                    stepSize: 1,
+                                    font: { size: 11 },
+                                    padding: 8
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    font: { size: 11 },
+                                    padding: 8,
+                                    maxRotation: 0
+                                }
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: 'Bookings Distribution (Bar Chart)'
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                                padding: 10,
+                                titleFont: { size: 12 },
+                                bodyFont: { size: 12 }
+                            }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     </script>
 @endsection

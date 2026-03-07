@@ -1,9 +1,9 @@
 @extends('admin.layouts.app')
 @section('content')
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-9 col-lg-10 p-4">
+    <div class="container-fluid px-0">
+        <div class="row g-0">
+            <div class="col-12">
                 <h2 class="mb-4">Feedback Management</h2>
 
                 @if (session('success'))

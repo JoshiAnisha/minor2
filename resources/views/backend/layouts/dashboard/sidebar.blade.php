@@ -2,17 +2,39 @@
     .patient-sidebar {
         width: 260px;
         min-height: 100vh;
+        height: 100vh;
         position: fixed;
-        background: linear-gradient(180deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
-        border: none;
+        left: 0;
+        top: 0;
+        z-index: 1030;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
     }
-    .patient-sidebar .sidebar-brand { color: #fff; font-weight: 700; padding: 1rem 1.25rem; font-size: 1.25rem; }
-    .patient-sidebar .nav-link { color: rgba(255,255,255,0.9); padding: 0.75rem 1.25rem; border-radius: 8px; margin: 0.25rem 0.75rem; }
-    .patient-sidebar .nav-link:hover { background: rgba(255,255,255,0.2); color: #fff; }
-    .patient-sidebar .nav-link.active { background: rgba(255,255,255,0.25); color: #fff; }
+    .patient-sidebar::-webkit-scrollbar { display: none; }
+    .patient-sidebar .sidebar-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .patient-sidebar .sidebar-brand .logo-img {
+        height: 42px;
+        width: auto;
+        object-fit: contain;
+        display: block;
+    }
+    .patient-sidebar .nav-link { color: #334155; padding: 0.75rem 1.25rem; border-radius: 8px; margin: 0.25rem 0.75rem; }
+    .patient-sidebar .nav-link:hover { background: #f1f5f9; color: #0ea5e9; }
+    .patient-sidebar .nav-link.active { background: #e0f2fe; color: #0284c7; }
 </style>
 <div class="patient-sidebar">
-    <a href="{{ route('patient.dashboard') }}" class="sidebar-brand text-decoration-none text-white d-block">SewaCare</a>
+    <a href="{{ route('patient.dashboard') }}" class="sidebar-brand text-decoration-none">
+        <img src="{{ asset('images/logo.png') }}" alt="Home" class="logo-img">
+    </a>
     <ul class="nav flex-column p-2">
         <li class="nav-item mb-1">
             <a class="nav-link {{ request()->routeIs('patient.dashboard') ? 'active' : '' }}" href="{{ route('patient.dashboard') }}">
@@ -20,13 +42,13 @@
             </a>
         </li>
         <li class="nav-item mb-1">
-            <a class="nav-link {{ request()->routeIs('patient.bookings*') ? 'active' : '' }}" href="{{ route('patient.bookings.index') }}">
-                <i class="bi bi-calendar-check me-2"></i> Bookings
+            <a class="nav-link {{ request()->routeIs('patient.services*') ? 'active' : '' }}" href="{{ route('patient.services.index') }}">
+                <i class="bi bi-heart-pulse me-2"></i> Services
             </a>
         </li>
         <li class="nav-item mb-1">
-            <a class="nav-link {{ request()->routeIs('patient.services*') ? 'active' : '' }}" href="{{ route('patient.services.index') }}">
-                <i class="bi bi-heart-pulse me-2"></i> Services
+            <a class="nav-link {{ request()->routeIs('patient.bookings*') ? 'active' : '' }}" href="{{ route('patient.bookings.index') }}">
+                <i class="bi bi-calendar-check me-2"></i> Bookings
             </a>
         </li>
         <li class="nav-item mb-1">
@@ -52,7 +74,7 @@
                 <i class="bi bi-person-circle me-2"></i> Profile
             </a>
         </li>
-        <hr class="my-2 mx-2 border-secondary opacity-50">
+        <hr class="my-2 mx-2 border-secondary opacity-25">
         <li class="nav-item">
             <form action="{{ route('backend.auth.logout') }}" method="POST" class="m-0 p-2">
                 @csrf

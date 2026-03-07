@@ -16,7 +16,7 @@ class ServiceController extends Controller
     {
         $this->authorizeAdmin();
         try {
-            $services = Service::orderBy('name')->get();
+            $services = Service::orderBy('category')->orderBy('name')->get();
         } catch (\Throwable $e) {
             \Log::warning('Admin services index: ' . $e->getMessage());
             $services = collect([]);
@@ -30,7 +30,8 @@ class ServiceController extends Controller
     public function create()
     {
         $this->authorizeAdmin();
-        return view('admin.services.create');
+        $existingCategories = $this->getExistingCategories();
+        return view('admin.services.create', compact('existingCategories'));
     }
 
     /**
@@ -48,6 +49,30 @@ class ServiceController extends Controller
     }
 
     /**
+     * Get existing categories from services plus default options (for empty DB).
+     */
+    private function getExistingCategories(): array
+    {
+        $fromDb = Service::whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values()
+            ->all();
+        $defaults = [
+            'Doctor & Consultation',
+            'Nursing & Care',
+            'Therapy',
+            'Elderly & Caregiver',
+            'Lab & Pharmacy',
+            'Equipment',
+            'Specialized Care',
+        ];
+        return array_values(array_unique(array_merge($defaults, $fromDb)));
+    }
+
+    /**
      * Store a newly created service in storage.
      */
     public function store(Request $request)
@@ -60,7 +85,10 @@ class ServiceController extends Controller
             'details' => 'nullable|string',
             'base_price' => 'required|numeric|min:0',
             'service_type' => 'required|string|in:medical,regular',
+            'category' => 'nullable|string|max:100',
+            'is_long_term' => 'nullable|boolean',
         ]);
+        $validated['is_long_term'] = $request->boolean('is_long_term');
 
         $slug = isset($validated['slug']) ? trim($validated['slug']) : '';
         if ($slug === '') {
@@ -104,7 +132,8 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         $this->authorizeAdmin();
-        return view('admin.services.edit', compact('service'));
+        $existingCategories = $this->getExistingCategories();
+        return view('admin.services.edit', compact('service', 'existingCategories'));
     }
 
     /**
@@ -120,7 +149,10 @@ class ServiceController extends Controller
             'details' => 'nullable|string',
             'base_price' => 'required|numeric|min:0',
             'service_type' => 'required|string|in:medical,regular',
+            'category' => 'nullable|string|max:100',
+            'is_long_term' => 'nullable|boolean',
         ]);
+        $validated['is_long_term'] = $request->boolean('is_long_term');
 
         $slug = isset($validated['slug']) ? trim($validated['slug']) : '';
         if ($slug === '') {

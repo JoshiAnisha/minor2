@@ -14,6 +14,12 @@ class Patient extends Model
 {
     use HasFactory;
 
+    /**
+     * The patients table may not have created_at/updated_at columns (legacy schema).
+     * Disable timestamps so inserts/updates do not require them.
+     */
+    public $timestamps = false;
+
     /*
     |--------------------------------------------------------------------------
     | Mass Assignable Fields
@@ -61,6 +67,21 @@ class Patient extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Default attributes when creating a new patient.
+     * Only includes columns that exist and may be NOT NULL (no default) in the DB.
+     * Omit columns that don't exist in your patients table (e.g. allergies, disabilities).
+     */
+    public static function defaultAttributesForCreate(int $userId): array
+    {
+        return [
+            'user_id' => $userId,
+            'medical_history' => '',
+            'prescriptions' => '',
+            'health_condition' => '',
+        ];
+    }
 
     /**
      * Patient → User (One to One)

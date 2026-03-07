@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('service_requests')) {
+            return;
+        }
         Schema::create('service_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('patient_id'); // FK to users table
