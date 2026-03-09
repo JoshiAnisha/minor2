@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Models\Caregiver;
 use App\Models\Service;
 use App\Models\Booking;
+use App\Models\ServiceRequest;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -23,9 +24,9 @@ class DashboardController extends Controller
 
         // Key metrics: only count by role so admin/other users are excluded
         $totalPatients = Patient::whereHas('user', fn ($q) => $q->where('role', 'patient'))->count();
-        // Total caregivers = all users with role 'caregiver' (fetched from caregivers table)
         $totalCaregivers = Caregiver::whereHas('user', fn ($q) => $q->where('role', 'caregiver'))->count();
         $totalServices = Service::count();
+        $pendingServiceRequests = ServiceRequest::where('status', 'pending')->count();
 
         // Bookings by status (bookings.status enum: pending, accepted, completed, cancelled)
         $bookingsByStatus = [
@@ -34,6 +35,7 @@ class DashboardController extends Controller
             'completed'  => Booking::where('status', 'completed')->count(),
             'cancelled'  => Booking::where('status', 'cancelled')->count(),
         ];
+        $totalBookings = array_sum($bookingsByStatus);
 
         // Prepare data for Chart.js
         $chartLabels = ['Pending', 'In Process', 'Completed', 'Cancelled'];
@@ -49,6 +51,8 @@ class DashboardController extends Controller
             'totalPatients',
             'totalCaregivers',
             'totalServices',
+            'pendingServiceRequests',
+            'totalBookings',
             'bookingsByStatus',
             'chartLabels',
             'chartData',

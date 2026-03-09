@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Patient;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Review;
 use App\Models\Service;
 
 class BookingController extends Controller
@@ -50,7 +51,12 @@ class BookingController extends Controller
             ->orderBy('start_date', 'desc')
             ->get();
 
-        return view('backend.patient.bookings.index', compact('bookings'));
+        $reviewedBookingIds = Review::where('user_id', auth()->id())
+            ->whereIn('bookings_id', $bookings->pluck('booking_id'))
+            ->pluck('bookings_id')
+            ->toArray();
+
+        return view('backend.patient.bookings.index', compact('bookings', 'reviewedBookingIds'));
     }
 
     public function show($id)
@@ -64,6 +70,10 @@ class BookingController extends Controller
             ->where('patients_id', $patient->id)
             ->findOrFail($id);
 
-        return view('backend.patient.bookings.show', compact('booking'));
+        $hasReview = Review::where('user_id', auth()->id())
+            ->where('bookings_id', $booking->getKey())
+            ->first();
+
+        return view('backend.patient.bookings.show', compact('booking', 'hasReview'));
     }
 }

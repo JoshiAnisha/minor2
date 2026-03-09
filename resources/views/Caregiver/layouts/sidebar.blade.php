@@ -52,9 +52,6 @@
         <a class="nav-link {{ request()->routeIs('caregiver.service.requests') ? 'active' : '' }}" href="{{ route('caregiver.service.requests') }}">
             <i class="bi bi-clipboard2-pulse me-2"></i> Service Requests
         </a>
-        <a class="nav-link {{ request()->routeIs('caregiver.shift*') ? 'active' : '' }}" href="{{ route('caregiver.shift.index') }}">
-            <i class="bi bi-clock me-2"></i> My Schedule
-        </a>
         <a class="nav-link {{ request()->routeIs('caregiver.notifications*') ? 'active' : '' }}" href="{{ route('caregiver.notifications.index') }}">
             <i class="bi bi-bell me-2"></i> Notifications
             @if(auth()->user()->unreadNotifications->count() > 0)

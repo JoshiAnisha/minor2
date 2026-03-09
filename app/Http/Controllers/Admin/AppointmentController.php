@@ -3,72 +3,43 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Appointment;
+use App\Models\ServiceRequest;
 
 class AppointmentController extends Controller
 {
-    // Show all appointments
+    /**
+     * Show all service requests (appointments) in a categorized way.
+     * Groups by service category and provides status counts.
+     */
     public function index()
-{
-    $appointments = Appointment::latest()->get();
-    return view('admin.appointment', compact('appointments'));
-}
-
-
-    // Show form to create new appointment
-    public function create()
     {
-        return view('admin.appointments.create');
-    }
+        $serviceRequests = ServiceRequest::with(['patient.user', 'service'])
+            ->latest()
+            ->get();
 
-    // Store new appointment
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'  => 'required|string',
-            'email' => 'required|email',
-            'date'  => 'required|date',
-            'time'  => 'required'
-        ]);
+        // Counts by status
+        $total = $serviceRequests->count();
+        $pending = $serviceRequests->where('status', 'pending')->count();
+        $accepted = $serviceRequests->where('status', 'accepted')->count();
+        $completed = $serviceRequests->where('status', 'completed')->count();
+        $rejected = $serviceRequests->where('status', 'rejected')->count();
 
-        Appointment::create($request->all());
+        // Group by service category (service->category)
+        $byCategory = $serviceRequests->groupBy(function ($sr) {
+            $category = $sr->relationLoaded('service') && $sr->service
+                ? ($sr->service->category ?: 'Uncategorized')
+                : 'Uncategorized';
+            return $category;
+        })->sortKeys();
 
-        return redirect()
-            ->route('admin.appointments.index')
-            ->with('success', 'Appointment created successfully!');
-    }
-
-    // Show form to edit appointment
-    public function edit(Appointment $appointment)
-    {
-        return view('admin.appointments.edit', compact('appointment'));
-    }
-
-    // Update appointment
-    public function update(Request $request, Appointment $appointment)
-    {
-        $request->validate([
-            'name'  => 'required|string',
-            'email' => 'required|email',
-            'date'  => 'required|date',
-            'time'  => 'required'
-        ]);
-
-        $appointment->update($request->all());
-
-        return redirect()
-            ->route('admin.appointments.index')
-            ->with('success', 'Appointment updated successfully!');
-    }
-
-    // Delete appointment
-    public function destroy(Appointment $appointment)
-    {
-        $appointment->delete();
-
-        return redirect()
-            ->route('admin.appointments.index')
-            ->with('success', 'Appointment deleted successfully!');
+        return view('admin.appointment', compact(
+            'serviceRequests',
+            'byCategory',
+            'total',
+            'pending',
+            'accepted',
+            'completed',
+            'rejected'
+        ));
     }
 }

@@ -8,6 +8,22 @@
         </div>
 
         <div class="row g-4">
+            {{-- Profile picture and name --}}
+            <div class="col-12 mb-3">
+                <div class="d-flex align-items-center gap-3 p-3 rounded bg-light">
+                    <div class="flex-shrink-0">
+                        @if($patient->profile_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($patient->profile_photo))
+                            <img src="{{ asset('storage/' . $patient->profile_photo) }}" alt="Profile picture" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
+                        @else
+                            <img src="{{ $patient->user ? 'https://ui-avatars.com/api/?name=' . urlencode($patient->user->name) . '&size=80&background=0ea5e9&color=fff' : 'https://ui-avatars.com/api/?name=Patient&size=80&background=0ea5e9&color=fff' }}" alt="Profile" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
+                        @endif
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">{{ optional($patient->user)->name ?? 'N/A' }}</h5>
+                        <p class="text-muted small mb-0">Patient</p>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-6">
                 <div class="border rounded p-3 h-100">
                     <h5 class="text-info mb-3">Basic Info</h5>

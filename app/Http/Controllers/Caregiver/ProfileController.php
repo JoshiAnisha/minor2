@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Caregiver;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Caregiver;
@@ -46,8 +47,10 @@ class ProfileController extends Controller
             'caregiver_type' => 'nullable|in:medical,regular,home_nurse',
             'availability_status' => 'nullable|boolean',
             'certificate' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+        if ($request->hasFile('profile_photo')) {
+            $request->validate(['profile_photo' => 'file|mimes:jpg,jpeg,png|max:5120']);
+        }
 
         // Update user
         User::where('id', $user->id)->update([
@@ -58,10 +61,9 @@ class ProfileController extends Controller
         
         $user = Auth::user();
 
-        // ✅ FIXED: users_id
-        $caregiver = Caregiver::firstOrNew(['users_id' => $user->id]);
+        $caregiver = Caregiver::where('users_id', $user->id)->first();
 
-        $caregiver->fill([
+        $data = [
             'contact_number' => $request->contact_number,
             'address' => $request->address,
             'skills' => $request->skills,
@@ -71,33 +73,69 @@ class ProfileController extends Controller
             'experience' => $request->experience,
             'caregiver_type' => $request->caregiver_type,
             'availability_status' => $request->has('availability_status'),
-        ]);
+        ];
 
         // Certificate upload
-         if ($request->hasFile('certificate')) {
-            if ($caregiver->certificate_path) {
+        if ($request->hasFile('certificate')) {
+            if ($caregiver && $caregiver->certificate_path) {
                 Storage::disk('public')->delete($caregiver->certificate_path);
             }
-
             $filename = Str::uuid() . '.' . $request->file('certificate')->getClientOriginalExtension();
-            $caregiver->certificate_path =
-                $request->file('certificate')->storeAs('certificates', $filename, 'public');
+            $data['certificate_path'] = $request->file('certificate')->storeAs('certificates', $filename, 'public');
         }
 
-        // Profile photo upload
-        if ($request->hasFile('profile_photo')) {
-            if ($caregiver->profile_photo_path) {
+        // Persist caregiver row first (so we always have a row to update)
+        Caregiver::updateOrCreate(
+            ['users_id' => $user->id],
+            $data
+        );
+
+        // Profile photo: handle separately and force-write to DB so it always saves
+        if ($request->hasFile('profile_photo') && $request->file('profile_photo')->isValid()) {
+            $caregiver = Caregiver::where('users_id', $user->id)->first();
+            if ($caregiver && $caregiver->profile_photo_path) {
                 Storage::disk('public')->delete($caregiver->profile_photo_path);
             }
-
             $photoName = Str::uuid() . '.' . $request->file('profile_photo')->getClientOriginalExtension();
-            $caregiver->profile_photo_path =
-                $request->file('profile_photo')->storeAs('profile_photos', $photoName, 'public');
+            $profilePhotoPath = $request->file('profile_photo')->storeAs('profile_photos', $photoName, 'public');
+
+            DB::table('caregivers')->where('users_id', $user->id)->update(['profile_photo_path' => $profilePhotoPath]);
         }
 
-        $caregiver->save();
-
         return back()->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Serve the logged-in caregiver's profile photo. Same pattern as viewCertificate().
+     */
+    public function viewProfilePhoto()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $caregiver = Caregiver::where('users_id', $user->id)->first();
+
+        if ($caregiver && $caregiver->profile_photo_path && Storage::disk('public')->exists($caregiver->profile_photo_path)) {
+            return response(
+                Storage::disk('public')->get($caregiver->profile_photo_path),
+                200,
+                [
+                    'Content-Type' => mime_content_type(Storage::disk('public')->path($caregiver->profile_photo_path)),
+                    'Content-Disposition' => 'inline',
+                ]
+            );
+        }
+
+        $defaultPath = public_path('Images/default-profile.png');
+        if (file_exists($defaultPath)) {
+            return response()->file($defaultPath, ['Content-Type' => 'image/png']);
+        }
+
+        // Fallback: 1x1 transparent GIF so img never breaks (same idea as certificate returning 404 when missing)
+        $gif = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+        return response($gif, 200, ['Content-Type' => 'image/gif']);
     }
 
     public function viewCertificate()

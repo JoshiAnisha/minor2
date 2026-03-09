@@ -20,11 +20,13 @@ class CaregiverMarkedPaymentReceivedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         $amount = $this->booking->price ? number_format((float) $this->booking->price, 0) : '0';
+        $bookingId = $this->booking->getKey();
+        $link = $bookingId ? route('patient.bookings.show', ['id' => $bookingId]) : route('patient.bookings.index');
         return [
             'type'    => 'caregiver_marked_paid',
             'message' => "{$this->caregiverName} marked payment of Rs {$amount} as received for your completed booking.",
-            'booking_id' => $this->booking->id,
-            'link'    => route('patient.bookings.show', $this->booking->id),
+            'booking_id' => $bookingId,
+            'link'    => $link,
         ];
     }
 }

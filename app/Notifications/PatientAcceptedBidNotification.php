@@ -25,7 +25,7 @@ class PatientAcceptedBidNotification extends Notification
         return [
             'type' => 'patient_accepted_bid',
             'message' => "{$this->patientName} accepted your bid. Booking created for Rs " . number_format($this->bid->proposed_price, 2) . ".",
-            'booking_id' => $this->booking->id,
+            'booking_id' => $this->booking->getKey(),
             'link' => route('caregiver.bookings'),
         ];
     }

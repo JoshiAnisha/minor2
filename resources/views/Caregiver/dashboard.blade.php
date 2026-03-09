@@ -50,6 +50,19 @@
     <p class="text-muted mb-0">Here’s your caregiving overview</p>
 </div>
 
+@if(isset($profileComplete) && !$profileComplete)
+    <div class="alert alert-warning border-0 shadow-sm mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3" style="border-radius: 12px; border-left: 4px solid #eab308;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-warning bg-opacity-25 p-2"><i class="bi bi-exclamation-triangle-fill text-warning"></i></div>
+            <div>
+                <h6 class="fw-bold mb-1">Complete your profile</h6>
+                <p class="mb-0 small text-muted">You must complete your profile (name, email, contact number, and address) before accepting a service request or placing a bid.</p>
+            </div>
+        </div>
+        <a href="{{ route('caregiver.profile.edit') }}" class="btn btn-warning">Complete profile</a>
+    </div>
+@endif
+
 {{-- Stats Row --}}
 <div class="row g-4 mb-4">
     <div class="col-sm-6 col-lg-4">
@@ -169,7 +182,7 @@
             </div>
         </div>
 
-        {{-- New Service Requests – action list --}}
+        {{-- New Service Requests --}}
         <div class="card section-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>New Service Requests</span>
@@ -191,10 +204,22 @@
                             <tbody>
                                 @foreach($pendingServiceRequests as $req)
                                     <tr>
-                                        <td>{{ optional($req->user)->name ?? 'N/A' }}</td>
+                                        <td>
+                                            @if($req->patient)
+                                                <a href="{{ route('caregiver.patient.show', $req->patient) }}" class="text-decoration-none">{{ optional($req->patient->user)->name ?? optional($req->user)->name ?? 'N/A' }}</a>
+                                            @else
+                                                {{ optional($req->user)->name ?? 'N/A' }}
+                                            @endif
+                                        </td>
                                         <td>{{ $req->service->name ?? '-' }}</td>
                                         <td>{{ Str::limit($req->location ?? '-', 20) }}</td>
-                                        <td>{{ $req->preferred_time ? $req->preferred_time->format('d M') : '-' }}</td>
+                                        <td>
+                                            @if ($req->isLongTerm() && $req->start_date && $req->end_date)
+                                                {{ $req->start_date->format('d M') }} – {{ $req->end_date->format('d M') }}
+                                            @else
+                                                {{ $req->preferred_time ? $req->preferred_time->format('d M') : '-' }}
+                                            @endif
+                                        </td>
                                         <td><a href="{{ route('caregiver.service.requests') }}" class="btn btn-sm btn-primary">Respond</a></td>
                                     </tr>
                                 @endforeach
@@ -226,7 +251,11 @@
                         @foreach($todaysBookings as $booking)
                             <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
                                 <div>
-                                    <strong class="small">{{ optional(optional($booking->patient)->user)->name ?? 'N/A' }}</strong>
+                                    @if($booking->patient)
+                                        <a href="{{ route('caregiver.patient.show', $booking->patient) }}" class="text-decoration-none small fw-semibold">{{ optional($booking->patient->user)->name ?? 'N/A' }}</a>
+                                    @else
+                                        <strong class="small">{{ optional(optional($booking->patient)->user)->name ?? 'N/A' }}</strong>
+                                    @endif
                                     <br><small class="text-muted">{{ optional($booking->service)->name ?? '-' }}</small>
                                 </div>
                                 <div class="text-end">
@@ -267,7 +296,7 @@
                     </li>
                     <li class="d-flex align-items-start">
                         <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                        <span>Keep your schedule updated so patients can book you easily.</span>
+                        <span>Check Service Requests regularly — all new patient requests appear there for you to accept or bid.</span>
                     </li>
                 </ul>
             </div>

@@ -4,7 +4,42 @@
     <div class="container-fluid px-0">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Services</h3>
-            <a href="{{ route('admin.services.create') }}" class="btn btn-primary">Open new service</a>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="newServiceDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Open new service
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="newServiceDropdown">
+                    @foreach ($categoriesWithTermTypes ?? [] as $category => $termTypes)
+                        <li><h6 class="dropdown-header">{{ $category }}</h6></li>
+                        @if($termTypes['short'] ?? false)
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.services.create', ['category' => $category, 'is_long_term' => 0]) }}">
+                                    <i class="bi bi-clock me-2"></i>Short-term
+                                </a>
+                            </li>
+                        @endif
+                        @if($termTypes['long'] ?? false)
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.services.create', ['category' => $category, 'is_long_term' => 1]) }}">
+                                    <i class="bi bi-calendar-range me-2"></i>Long-term
+                                </a>
+                            </li>
+                        @endif
+                        @if(!$loop->last)
+                            <li><hr class="dropdown-divider"></li>
+                        @endif
+                    @endforeach
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-muted" href="{{ route('admin.services.create') }}">
+                            <i class="bi bi-three-dots me-2"></i>Others <span class="small">(Uncategorized)</span>
+                        </a>
+                    </li>
+                    @if(empty($categoriesWithTermTypes))
+                        <li><a class="dropdown-item" href="{{ route('admin.services.create') }}">Create new service</a></li>
+                    @endif
+                </ul>
+            </div>
         </div>
 
         @if (session('success'))

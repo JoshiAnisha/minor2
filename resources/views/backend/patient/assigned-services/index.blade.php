@@ -53,7 +53,7 @@
                         <tbody>
                             @foreach ($as->bids->where('status', 'pending') as $bid)
                                 <tr>
-                                    <td>{{ optional($bid->caregiver->user)->name ?? 'N/A' }}</td>
+                                    <td><a href="{{ route('patient.caregiver.show', $bid->caregiver) }}" class="text-decoration-none">{{ optional($bid->caregiver->user)->name ?? 'N/A' }}</a></td>
                                     <td class="fw-bold">Rs {{ number_format($bid->proposed_price, 2) }}</td>
                                     <td class="text-muted small">{{ $bid->message ? \Str::limit($bid->message, 50) : '—' }}</td>
                                     <td>
@@ -74,7 +74,7 @@
             @endif
 
             @if ($as->status === 'accepted' && $as->assignedCaregiver)
-                <p class="mb-0 mt-2 text-success"><i class="bi bi-check-circle me-1"></i> Assigned to {{ optional($as->assignedCaregiver->user)->name ?? 'Caregiver' }}</p>
+                <p class="mb-0 mt-2 text-success"><i class="bi bi-check-circle me-1"></i> Assigned to <a href="{{ route('patient.caregiver.show', $as->assignedCaregiver) }}" class="text-decoration-none">{{ optional($as->assignedCaregiver->user)->name ?? 'Caregiver' }}</a></p>
             @endif
         </div>
     </div>

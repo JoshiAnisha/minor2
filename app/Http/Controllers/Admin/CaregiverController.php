@@ -37,6 +37,13 @@ class CaregiverController extends Controller
     }
 
 
+    // 🔹 Show profile
+    public function show(Caregiver $caregiver)
+    {
+        $caregiver->load('user');
+        return view('admin.caregivers.show', compact('caregiver'));
+    }
+
     // 🔹 Edit page
     public function edit(Caregiver $caregiver)
     {

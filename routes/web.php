@@ -16,10 +16,10 @@ use App\Http\Controllers\Backend\Patient\ServiceRequestController as PatientServ
 use App\Http\Controllers\Backend\Patient\AssignedServiceController as PatientAssignedServiceController;
 use App\Http\Controllers\Backend\Patient\InvoiceController as PatientInvoiceController;
 use App\Http\Controllers\Backend\Patient\ReviewController as PatientReviewController;
+use App\Http\Controllers\Backend\Patient\CaregiverController as PatientCaregiverController;
 
 // Caregiver Controllers
 use App\Http\Controllers\Caregiver\CaregiverController;
-use App\Http\Controllers\Caregiver\ShiftTimeController;
 use App\Http\Controllers\Caregiver\ServiceRequestController;
 use App\Http\Controllers\Caregiver\AssignedServiceController as CaregiverAssignedServiceController;
 use App\Http\Controllers\Caregiver\CaregiverBookingController;
@@ -43,31 +43,35 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 // ------------------------
-// Authentication Routes
+// Authentication Routes (rate-limited to prevent brute force)
 // ------------------------
 Route::prefix('auth')->name('backend.auth.')->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post')
+        ->middleware('throttle:register');
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post')
+        ->middleware('throttle:login');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Forgot / Reset Password
+    // Forgot / Reset Password (rate-limited)
     Route::get('/forgot-password', [AuthController::class, 'showForgot'])->name('password.request');
-    Route::post('/forgot-password', [AuthController::class, 'sendReset'])->name('password.email');
+    Route::post('/forgot-password', [AuthController::class, 'sendReset'])->name('password.email')
+        ->middleware('throttle:password');
 
     Route::get('/reset-password/{token}', [AuthController::class, 'showReset'])->name('password.reset');
-    Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.update');
+    Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.update')
+        ->middleware('throttle:password');
 });
 
 
 // ------------------------
 // Patient Routes (Authenticated)
 // ------------------------
-Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function () {
+Route::prefix('patient')->name('patient.')->middleware(['auth', 'role:patient', 'prevent.cache'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [PatientDashboardController::class, 'index'])->name('dashboard');
@@ -80,12 +84,14 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     // Invoices
     Route::get('/invoices', [PatientInvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{id}', [PatientInvoiceController::class, 'show'])->name('invoices.show');
-    Route::post('/invoices/{invoice}/pay', [PatientInvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
 
     // Reviews
     Route::get('/reviews', [PatientReviewController::class, 'index'])->name('reviews.index');
     Route::get('/reviews/create', [PatientReviewController::class, 'create'])->name('reviews.create');
     Route::post('/reviews', [PatientReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/{review}/edit', [PatientReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [PatientReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [PatientReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Services
     Route::get('/services', [PatientServiceController::class, 'index'])->name('services.index');
@@ -97,11 +103,16 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     Route::get('/service-requests/custom', [PatientServiceRequestController::class, 'createCustom'])->name('service-requests.create-custom');
     Route::post('/bids/{bid}/accept', [PatientServiceRequestController::class, 'acceptBid'])->name('bids.accept');
     Route::post('/bids/{bid}/reject', [PatientServiceRequestController::class, 'rejectBid'])->name('bids.reject');
+    Route::get('/caregiver/{caregiver}', [PatientCaregiverController::class, 'show'])->name('caregiver.show');
+    Route::get('/caregiver/{caregiver}/certificate', [PatientCaregiverController::class, 'certificate'])->name('caregiver.certificate');
+    Route::get('/caregiver/{caregiver}/photo', [PatientCaregiverController::class, 'photo'])->name('caregiver.photo');
 
     // Bookings
     Route::get('/bookings', [PatientBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/create', [PatientBookingController::class, 'create'])->name('bookings.create');
     Route::get('/bookings/{id}', [PatientBookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{id}/review', [PatientReviewController::class, 'createForBooking'])->name('bookings.review.create');
+    Route::post('/bookings/{id}/review', [PatientReviewController::class, 'storeForBooking'])->name('bookings.review.store');
 
     // Assigned services (admin-assigned; patient accepts caregiver bids)
     Route::get('/assigned-services', [PatientAssignedServiceController::class, 'index'])->name('assigned-services.index');
@@ -118,7 +129,7 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
 // ------------------------
 // Caregiver Routes (Authenticated)
 // ------------------------
-Route::middleware(['auth'])
+Route::middleware(['auth', 'role:caregiver', 'prevent.cache'])
     ->prefix('caregiver')
     ->name('caregiver.')
     ->group(function () {
@@ -138,10 +149,13 @@ Route::middleware(['auth'])
         Route::post('/bid/{bid}/accept', [CaregiverBookingController::class, 'acceptBid'])
             ->name('bid.accept');
 
-        Route::post('/booking/{booking}/complete', [CaregiverBookingController::class, 'complete'])
+        Route::post('/booking/{id}/complete', [CaregiverBookingController::class, 'complete'])
             ->name('booking.complete');
 
-        Route::post('/booking/{booking}/mark-paid', [CaregiverBookingController::class, 'markPaid'])
+        Route::post('/booking/{id}/cancel', [CaregiverBookingController::class, 'cancel'])
+            ->name('booking.cancel');
+
+        Route::post('/booking/{id}/mark-paid', [CaregiverBookingController::class, 'markPaid'])
             ->name('booking.mark-paid');
 
         // ========================
@@ -180,15 +194,6 @@ Route::middleware(['auth'])
             ->name('assigned-services.place-bid');
 
         // ========================
-        // Shift Time / Availability
-        // ========================
-        Route::get('/shift-time', [ShiftTimeController::class, 'index'])
-            ->name('shift.index');
-
-        Route::post('/shift-time', [ShiftTimeController::class, 'store'])
-            ->name('shift.store');
-
-        // ========================
         // Profile
         // ========================
         Route::get('/profile', [ProfileController::class, 'edit'])
@@ -196,9 +201,14 @@ Route::middleware(['auth'])
 
         Route::put('/profile', [ProfileController::class, 'update'])
             ->name('profile.update');
+        Route::post('/profile', [ProfileController::class, 'update'])
+            ->name('profile.update.post');
 
         Route::get('/profile/certificate', [ProfileController::class, 'viewCertificate'])
             ->name('profile.certificate');
+
+        Route::get('/profile/photo', [ProfileController::class, 'viewProfilePhoto'])
+            ->name('profile.photo');
 
         // Notifications
         Route::get('/notifications', [NotificationsController::class, 'index'])
@@ -214,7 +224,7 @@ Route::middleware(['auth'])
 // ------------------------
 // Admin Routes (Authenticated)
 // ------------------------
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'prevent.cache'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -223,6 +233,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/profile', [PatientDashboardController::class, 'profile'])->name('profile');
 
     // Manage Patients
+    Route::patch('/patients/{patient}/toggle-active', [AdminPatientController::class, 'toggleActive'])->name('patients.toggle-active');
     Route::resource('/patients', AdminPatientController::class);
 
     // Manage Caregivers

@@ -21,7 +21,7 @@ class CaregiverController extends Controller
             $pendingServiceRequests = ServiceRequest::with('user', 'service')
                 ->where('status', 'pending')
                 ->latest()
-                ->take(5)
+                ->take(3)
                 ->get();
             return view('Caregiver.dashboard', [
                 'upcomingVisits' => 0,
@@ -33,6 +33,7 @@ class CaregiverController extends Controller
                 'completedCount' => 0,
                 'pendingServiceRequests' => $pendingServiceRequests,
                 'weeklyBookings' => [0, 0, 0, 0, 0, 0, 0],
+                'profileComplete' => false,
             ]);
         }
         $caregiverId = $caregiver->id;
@@ -60,10 +61,17 @@ class CaregiverController extends Controller
                                 ->orderBy('date_time', 'asc')
                                 ->get();
 
-        // Booking overview for chart
-        $pendingCount = Booking::where('caregivers_id', $caregiverId)
-                                ->where('status', 'pending')
-                                ->count();
+        // Booking overview for chart (Pending = pending bookings + pending bids + pending service requests, same as My Bookings Pending section)
+        $rejectedRequestIds = \App\Models\ServiceRequestRejection::where('caregiver_id', $caregiverId)->pluck('service_request_id');
+        $pendingBookingsCount = Booking::where('caregivers_id', $caregiverId)
+            ->where('status', 'pending')
+            ->count();
+        $pendingBidsCount = Bid::where('caregivers_id', $caregiverId)
+            ->where('status', 'pending')
+            ->whereHas('serviceRequest')
+            ->count();
+        $pendingRequestsCount = ServiceRequest::where('status', 'pending')->count();
+        $pendingCount = $pendingBookingsCount + $pendingBidsCount + $pendingRequestsCount;
         $inProgressCount = Booking::where('caregivers_id', $caregiverId)
                                 ->where('status', 'accepted')
                                 ->count();
@@ -71,9 +79,9 @@ class CaregiverController extends Controller
 
         $pendingServiceRequests = ServiceRequest::with('user', 'service')
             ->where('status', 'pending')
-            ->whereNotIn('id', \App\Models\ServiceRequestRejection::where('caregiver_id', $caregiverId)->pluck('service_request_id'))
+            ->whereNotIn('id', $rejectedRequestIds)
             ->latest()
-            ->take(5)
+            ->take(3)
             ->get();
 
         $startOfWeek = now()->startOfWeek();
@@ -85,6 +93,8 @@ class CaregiverController extends Controller
                 ->count();
         }
 
+        $profileComplete = $user->isProfileComplete();
+
         return view('Caregiver.dashboard', compact(
             'upcomingVisits',
             'tasksToLog',
@@ -94,7 +104,8 @@ class CaregiverController extends Controller
             'inProgressCount',
             'completedCount',
             'pendingServiceRequests',
-            'weeklyBookings'
+            'weeklyBookings',
+            'profileComplete'
         ));
     }
 }

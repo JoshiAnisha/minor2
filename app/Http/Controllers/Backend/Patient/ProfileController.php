@@ -15,9 +15,22 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $patient = $user->patient;
-        $reviews = Review::where('user_id', $user->id)->with('service')->latest()->take(15)->get();
 
-        return view('backend.patient.profile.show', compact('user', 'patient', 'reviews'));
+        // Reviews this patient has written (about caregivers/services)
+        $myReviews = Review::where('user_id', $user->id)->with('service')->latest()->take(15)->get();
+
+        // Reviews given by caregivers about this patient / service (bookings where this patient was involved)
+        $reviewsFromCaregivers = collect([]);
+        if ($patient) {
+            $reviewsFromCaregivers = Review::whereHas('user', fn ($q) => $q->where('role', 'caregiver'))
+                ->whereHas('booking', fn ($q) => $q->where('patients_id', $patient->id))
+                ->with(['user', 'service', 'booking.caregiver.user'])
+                ->latest()
+                ->take(15)
+                ->get();
+        }
+
+        return view('backend.patient.profile.show', compact('user', 'patient', 'myReviews', 'reviewsFromCaregivers'));
     }
 
     public function edit()
@@ -71,20 +84,20 @@ class ProfileController extends Controller
                 ->store('patients', 'public');
         }
 
-        // ✅ Update patient fields (include contact_number so profile show has it)
+        // ✅ Update patient fields (use empty string for text/string to avoid NOT NULL errors)
         $patient->fill([
             'contact_number'           => $validated['contact_number'] ?? null,
             'date_of_birth'            => $validated['date_of_birth'] ?? null,
             'gender'                   => $validated['gender'] ?? null,
             'blood_group'              => $validated['blood_group'] ?? null,
-            'address'                  => $validated['address'] ?? null,
-            'city'                     => $validated['city'] ?? null,
-            'state'                    => $validated['state'] ?? null,
-            'postal_code'              => $validated['postal_code'] ?? null,
-            'emergency_contact_name'   => $validated['emergency_contact_name'] ?? null,
-            'emergency_contact_number' => $validated['emergency_contact_number'] ?? null,
-            'medical_history'          => $validated['medical_history'] ?? null,
-            'allergies'                => $validated['allergies'] ?? null,
+            'address'                  => $validated['address'] ?: null,
+            'city'                     => $validated['city'] ?: null,
+            'state'                    => $validated['state'] ?: null,
+            'postal_code'              => $validated['postal_code'] ?: null,
+            'emergency_contact_name'   => $validated['emergency_contact_name'] ?: null,
+            'emergency_contact_number' => $validated['emergency_contact_number'] ?: null,
+            'medical_history'          => $validated['medical_history'] !== null && $validated['medical_history'] !== '' ? $validated['medical_history'] : '',
+            'allergies'                => $validated['allergies'] !== null && $validated['allergies'] !== '' ? $validated['allergies'] : '',
         ]);
 
         $patient->user_id = $user->id;

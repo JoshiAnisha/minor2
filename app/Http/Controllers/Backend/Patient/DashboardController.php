@@ -39,7 +39,7 @@ class DashboardController extends Controller
             $totalBookings = $patient
                 ? Booking::where('patients_id', $patient->id)->count()
                 : 0;
-            $myRequestsCount = ServiceRequest::where('patient_id', $user->id)->count();
+            $myRequestsCount = $patient ? ServiceRequest::where('patient_id', $patient->id)->count() : 0;
             $totalInvoices = Invoice::where('user_id', $user->id)->count();
 
             $latestBookings = $patient
@@ -65,12 +65,15 @@ class DashboardController extends Controller
             $availableServices = collect([]);
         }
 
+        $profileComplete = $user->isProfileComplete();
+
         return view('backend.patient.dashboard.index', compact(
             'totalBookings',
             'myRequestsCount',
             'totalInvoices',
             'latestBookings',
-            'availableServices'
+            'availableServices',
+            'profileComplete'
         ));
     }
 }

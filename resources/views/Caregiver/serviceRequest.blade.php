@@ -8,23 +8,25 @@
         --sewa-bg: #e0f2fe;
     }
     .request-card {
-        border-radius: 12px;
+        border-radius: 10px;
         border: none;
         transition: all 0.2s ease;
     }
     .request-card:hover {
-        box-shadow: 0 8px 24px rgba(13, 148, 136, 0.12);
-        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(13, 148, 136, 0.12);
+        transform: translateY(-1px);
     }
     .request-card .card-header {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         color: white;
-        border-radius: 12px 12px 0 0;
-        padding: 1rem 1.25rem;
+        border-radius: 10px 10px 0 0;
+        padding: 0.5rem 0.75rem;
         font-weight: 600;
+        font-size: 0.9rem;
     }
-    .info-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-    .info-row i { color: var(--sewa-primary); min-width: 20px; }
+    .request-card .card-body { padding: 0.65rem 0.75rem; }
+    .info-row { display: flex; gap: 0.35rem; margin-bottom: 0.35rem; font-size: 0.85rem; }
+    .info-row i { color: var(--sewa-primary); min-width: 16px; font-size: 0.8rem; }
     .btn-accept { background: #059669; border-color: #059669; }
     .btn-accept:hover { background: #047857; border-color: #047857; }
 </style>
@@ -33,7 +35,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1 fw-bold">Service Requests</h2>
-            <p class="text-muted mb-0">Respond to patient requests — accept at base price or place a bid</p>
+            <p class="text-muted mb-0">All new patient requests appear here. Accept at base price, place a bid, or decline — requests you decline will be hidden from your list.</p>
         </div>
     </div>
 
@@ -54,92 +56,37 @@
         </div>
     @endif
 
-    @if (isset($hasNoSchedule) && $hasNoSchedule)
-        <div class="alert alert-warning mb-4">
-            <strong>No schedule set.</strong> Add your availability in <a href="{{ route('caregiver.shift.index') }}">My Schedule</a>. Only requests that match your shift (Morning/Day/Night) and date will appear here for you to accept or reject.
-        </div>
-    @endif
-
     @if ($requests->isEmpty())
         <div class="card request-card shadow-sm">
             <div class="card-body text-center py-5">
                 <i class="bi bi-inbox display-4 text-muted mb-3"></i>
                 <h5 class="text-muted">No pending service requests</h5>
-                <p class="text-muted mb-0">
-                    @if (isset($hasNoSchedule) && $hasNoSchedule)
-                        Add your shift and dates in <a href="{{ route('caregiver.shift.index') }}">My Schedule</a> to see matching requests.
-                    @else
-                        No requests match your schedule right now, or no new requests from patients. Check back later.
-                    @endif
-                </p>
+                <p class="text-muted mb-0">When patients request a service, it will appear here. You can accept at base price, place a bid, or decline. Check back later for new requests.</p>
             </div>
         </div>
     @else
-        <div class="row g-4">
-            @foreach ($requests as $serviceRequest)
-                <div class="col-lg-6">
-                    <div class="card request-card shadow-sm h-100">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span>{{ $serviceRequest->service->name ?? 'Service' }}</span>
-                            <span class="badge bg-light text-dark">Rs {{ number_format($serviceRequest->service->base_price ?? 0, 0) }}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="info-row">
-                                <i class="bi bi-person"></i>
-                                <span><strong>Patient:</strong> {{ optional($serviceRequest->user)->name ?? 'N/A' }}</span>
-                            </div>
-                            <div class="info-row">
-                                <i class="bi bi-geo-alt"></i>
-                                <span>{{ $serviceRequest->location }}</span>
-                            </div>
-                            <div class="info-row">
-                                <i class="bi bi-calendar-event"></i>
-                                <span>{{ $serviceRequest->preferred_time ? $serviceRequest->preferred_time->format('d M Y, h:i A') : '-' }}</span>
-                            </div>
-                            <div class="info-row">
-                                <i class="bi bi-clock"></i>
-                                <span>Shift: {{ ucfirst($serviceRequest->shift_type ?? 'day') }}</span>
-                            </div>
-                            @if ($serviceRequest->description)
-                                <div class="info-row">
-                                    <i class="bi bi-chat-text"></i>
-                                    <span class="small text-muted">{{ Str::limit($serviceRequest->description, 120) }}</span>
-                                </div>
-                            @endif
+        @php
+            $longTermRequests = $requests->filter(fn($r) => $r->isLongTerm());
+            $shortTermRequests = $requests->filter(fn($r) => !$r->isLongTerm());
+        @endphp
 
-                            <hr class="my-3">
+        @if($shortTermRequests->isNotEmpty())
+            <h5 class="fw-bold mb-3 text-success"><i class="bi bi-calendar-day me-2"></i>Short-term (one day)</h5>
+            <div class="row g-3 mb-5">
+                @foreach ($shortTermRequests as $serviceRequest)
+                    @include('Caregiver.partials.service-request-card', ['serviceRequest' => $serviceRequest])
+                @endforeach
+            </div>
+        @endif
 
-                            <p class="small text-muted mb-3">Choose one:</p>
-                            <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-                                <form method="POST" action="{{ route('caregiver.service.acceptBase', $serviceRequest->id) }}" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success btn-accept btn-sm">Accept at base price</button>
-                                </form>
-                                <span class="text-muted">or</span>
-                                @php $basePrice = (float) ($serviceRequest->service->base_price ?? 0); @endphp
-                                <form method="POST" action="{{ route('caregiver.service.placeBid') }}" class="d-inline">
-                                    @csrf
-                                    <input type="hidden" name="service_request_id" value="{{ $serviceRequest->id }}">
-                                    <div class="d-flex flex-wrap align-items-center gap-2">
-                                        <small class="text-muted">Base: Rs {{ number_format($basePrice, 0) }}</small>
-                                        <div class="input-group input-group-sm" style="max-width: 220px;">
-                                            <span class="input-group-text text-muted small">+ Rs</span>
-                                            <input type="number" name="add_to_base" class="form-control" required placeholder="Add amount" step="0.01" min="0" title="Amount to add to base price. Total = base + this.">
-                                            <button type="submit" class="btn btn-warning">Bid</button>
-                                        </div>
-                                        <small class="text-muted">= your total bid (base + amount)</small>
-                                    </div>
-                                </form>
-                            </div>
-                            <form method="POST" action="{{ route('caregiver.service.reject', $serviceRequest->id) }}" class="d-inline" onsubmit="return confirm('Decline this request?');">
-                                @csrf
-                                <button type="submit" class="btn btn-link btn-sm text-muted p-0">Not interested</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+        @if($longTermRequests->isNotEmpty())
+            <h5 class="fw-bold mb-3 text-info"><i class="bi bi-calendar-range me-2"></i>Long-term</h5>
+            <div class="row g-3">
+                @foreach ($longTermRequests as $serviceRequest)
+                    @include('Caregiver.partials.service-request-card', ['serviceRequest' => $serviceRequest])
+                @endforeach
+            </div>
+        @endif
     @endif
 </div>
 @endsection

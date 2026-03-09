@@ -38,7 +38,7 @@
         </div>
 
         <div class="mb-3">
-            <p class="text-muted mb-0">Reviewing: <strong>{{ optional($patient->user)->name ?? 'N/A' }}</strong></p>
+            <p class="text-muted mb-0">Reviewing: <a href="{{ route('caregiver.patient.show', $patient) }}" class="text-decoration-none fw-semibold">{{ optional($patient->user)->name ?? 'N/A' }}</a></p>
         </div>
 
         @if (session('error'))

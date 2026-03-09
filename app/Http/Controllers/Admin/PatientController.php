@@ -25,7 +25,7 @@ class PatientController extends Controller
             ->get();
 
         $totalPatients = $patients->count();
-        $activePatients = $patients->count(); // All listed patients are active (have user.role = patient)
+        $activePatients = $patients->where('is_active', true)->count();
         $pendingPatients = 0;
 
         return view('admin.patient', compact(
@@ -34,6 +34,12 @@ class PatientController extends Controller
             'activePatients',
             'pendingPatients'
         ));
+    }
+
+    public function show(Patient $patient)
+    {
+        $patient->load('user');
+        return view('admin.patients.show', compact('patient'));
     }
 
     public function edit(Patient $patient)
@@ -65,5 +71,17 @@ class PatientController extends Controller
 
         return redirect()->route('admin.patients.index')
             ->with('success', 'Patient deleted successfully');
+    }
+
+    /**
+     * Toggle patient active status (activate / deactivate).
+     */
+    public function toggleActive(Patient $patient)
+    {
+        $patient->update(['is_active' => !$patient->is_active]);
+        $status = $patient->is_active ? 'activated' : 'deactivated';
+
+        return redirect()->route('admin.patients.index')
+            ->with('success', "Patient {$status} successfully.");
     }
 }

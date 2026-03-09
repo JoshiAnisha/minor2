@@ -21,17 +21,21 @@ class ServiceController extends Controller
             \Log::warning('Admin services index: ' . $e->getMessage());
             $services = collect([]);
         }
-        return view('admin.services.index', compact('services'));
+        $categoriesWithTermTypes = $this->getCategoriesWithTermTypes();
+        return view('admin.services.index', compact('services', 'categoriesWithTermTypes'));
     }
 
     /**
      * Show the form for creating a new service.
+     * Optional query params: category, is_long_term (0 or 1) to pre-fill the form.
      */
-    public function create()
+    public function create(Request $request)
     {
         $this->authorizeAdmin();
         $existingCategories = $this->getExistingCategories();
-        return view('admin.services.create', compact('existingCategories'));
+        $presetCategory = $request->query('category', '');
+        $presetLongTerm = $request->has('is_long_term') ? (bool) $request->query('is_long_term') : null;
+        return view('admin.services.create', compact('existingCategories', 'presetCategory', 'presetLongTerm'));
     }
 
     /**
@@ -70,6 +74,32 @@ class ServiceController extends Controller
             'Specialized Care',
         ];
         return array_values(array_unique(array_merge($defaults, $fromDb)));
+    }
+
+    /**
+     * For each category, analyze whether it can be short-term, long-term, or both (by nature of the category).
+     * Returns: [ 'Category Name' => ['short' => bool, 'long' => bool], ... ]
+     */
+    private function getCategoriesWithTermTypes(): array
+    {
+        $categories = $this->getExistingCategories();
+
+        // By nature: which categories typically support short-term, long-term, or both
+        $termTypeByCategory = [
+            'Doctor & Consultation' => ['short' => true, 'long' => true],   // one-time visit or ongoing
+            'Nursing & Care'       => ['short' => true, 'long' => true],   // single procedure or ongoing care
+            'Therapy'              => ['short' => true, 'long' => true],   // single session or ongoing
+            'Elderly & Caregiver'  => ['short' => false, 'long' => true],  // typically ongoing care
+            'Lab & Pharmacy'       => ['short' => true, 'long' => false],  // delivery, sample collection
+            'Equipment'            => ['short' => true, 'long' => true],   // short or long rental
+            'Specialized Care'     => ['short' => false, 'long' => true],  // e.g. palliative, ongoing
+        ];
+
+        $result = [];
+        foreach ($categories as $category) {
+            $result[$category] = $termTypeByCategory[$category] ?? ['short' => true, 'long' => true];
+        }
+        return $result;
     }
 
     /**

@@ -38,7 +38,17 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>
-                                        <strong>{{ optional($review->user)->name ?? 'Unknown' }}</strong>
+                                        @php
+                                            $reviewerPatient = $review->user && $review->user->role === 'patient' ? \App\Models\Patient::where('user_id', $review->user->id)->first() : null;
+                                            $reviewerCaregiver = $review->user && $review->user->role === 'caregiver' ? \App\Models\Caregiver::where('users_id', $review->user->id)->first() : null;
+                                        @endphp
+                                        @if($reviewerPatient)
+                                            <a href="{{ route('admin.patients.show', $reviewerPatient) }}" class="text-decoration-none fw-semibold">{{ $review->user->name ?? 'Unknown' }}</a>
+                                        @elseif($reviewerCaregiver)
+                                            <a href="{{ route('admin.caregivers.show', $reviewerCaregiver) }}" class="text-decoration-none fw-semibold">{{ $review->user->name ?? 'Unknown' }}</a>
+                                        @else
+                                            <strong>{{ optional($review->user)->name ?? 'Unknown' }}</strong>
+                                        @endif
                                         <br>
                                         <small class="text-muted">
                                             @if ($review->user)
@@ -52,11 +62,16 @@
                                     </td>
                                     <td>
                                         @if ($review->reviewed_party_type === 'patient')
-                                            <strong>{{ optional($review->reviewed_party)->name ?? 'Unknown Patient' }}</strong>
+                                            @php $revPatient = $review->reviewed_party ? \App\Models\Patient::where('user_id', $review->reviewed_party->id)->first() : null; @endphp
+                                            @if($revPatient)
+                                                <a href="{{ route('admin.patients.show', $revPatient) }}" class="text-decoration-none fw-semibold">{{ $review->reviewed_party->name ?? 'Unknown Patient' }}</a>
+                                            @else
+                                                <strong>{{ optional($review->reviewed_party)->name ?? 'Unknown Patient' }}</strong>
+                                            @endif
                                             <br>
                                             <small class="text-muted"><span class="badge bg-primary">Patient</span></small>
                                         @elseif($review->reviewed_party_type === 'caregiver')
-                                            <strong>{{ optional($review->reviewed_party->user)->name ?? 'Unknown Caregiver' }}</strong>
+                                            <a href="{{ route('admin.caregivers.show', $review->reviewed_party) }}" class="text-decoration-none fw-semibold">{{ optional($review->reviewed_party->user)->name ?? 'Unknown Caregiver' }}</a>
                                             <br>
                                             <small class="text-muted"><span class="badge bg-info">Caregiver</span></small>
                                         @else

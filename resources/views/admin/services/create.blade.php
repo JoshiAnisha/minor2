@@ -58,7 +58,7 @@
                             class="form-control @error('category') is-invalid @enderror"
                             id="category"
                             name="category"
-                            value="{{ old('category') }}"
+                            value="{{ old('category', $presetCategory ?? '') }}"
                             list="category-list"
                             placeholder="Choose existing or type a new category">
                         <datalist id="category-list">
@@ -74,7 +74,10 @@
 
                     <div class="mb-3 form-check">
                         <input type="hidden" name="is_long_term" value="0">
-                        <input type="checkbox" class="form-check-input" id="is_long_term" name="is_long_term" value="1" {{ old('is_long_term') ? 'checked' : '' }}>
+                        @php
+                            $isLongTermChecked = old('is_long_term') !== null ? old('is_long_term') : (isset($presetLongTerm) ? $presetLongTerm : false);
+                        @endphp
+                        <input type="checkbox" class="form-check-input" id="is_long_term" name="is_long_term" value="1" {{ $isLongTermChecked ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_long_term">Available for long-term booking</label>
                         <small class="form-text text-muted d-block">Check for services that can be taken on an ongoing basis (e.g. nursing, elderly care, physiotherapy).</small>
                     </div>

@@ -132,6 +132,19 @@
         <h1 class="welcome-name">Welcome back, {{ Auth::user()->name ?? 'Patient' }}</h1>
     </div>
 
+    @if(isset($profileComplete) && !$profileComplete)
+        <div class="alert alert-warning border-0 shadow-sm mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3" style="border-radius: 14px; border-left: 4px solid #eab308;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-warning bg-opacity-25 p-2"><i class="bi bi-exclamation-triangle-fill text-warning"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Complete your profile</h6>
+                    <p class="mb-0 small text-muted">You must complete your profile (name, email, contact number, and address) before making a service request or accepting an offer from a caregiver.</p>
+                </div>
+            </div>
+            <a href="{{ route('patient.profile.edit') }}" class="btn btn-warning">Complete profile</a>
+        </div>
+    @endif
+
     {{-- Quick links --}}
     <div class="mb-4">
         <h2 class="h6 text-uppercase fw-semibold text-muted mb-3">Quick links</h2>
@@ -285,7 +298,7 @@
                             <div class="booking-item">
                                 <div>
                                     <strong class="d-block">{{ optional($booking->service)->name ?? 'Service' }}</strong>
-                                    <small class="text-muted">{{ optional(optional($booking->caregiver)->user)->name ?? 'Caregiver' }} · {{ $booking->start_date ? \Carbon\Carbon::parse($booking->start_date)->format('d M Y') : '—' }}</small>
+                                    <small class="text-muted">@if($booking->caregiver)<a href="{{ route('patient.caregiver.show', $booking->caregiver) }}" class="text-decoration-none">{{ optional($booking->caregiver->user)->name ?? 'Caregiver' }}</a>@else{{ optional(optional($booking->caregiver)->user)->name ?? 'Caregiver' }}@endif · {{ $booking->start_date ? \Carbon\Carbon::parse($booking->start_date)->format('d M Y') : '—' }}</small>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge badge-status
@@ -295,7 +308,12 @@
                                         @else bg-secondary @endif">
                                         {{ ucfirst($booking->status ?? 'N/A') }}
                                     </span>
-                                    <a href="{{ route('patient.bookings.show', $booking->id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    @php $bookingId = $booking->getKey(); @endphp
+                                    @if($bookingId)
+                                        <a href="{{ route('patient.bookings.show', ['id' => $bookingId]) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    @else
+                                        <a href="{{ route('patient.bookings.index') }}" class="btn btn-sm btn-outline-secondary">View</a>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach

@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-4">
     <h1 class="h4 fw-bold mb-1">Invoices</h1>
-    <p class="text-muted small mb-0">Pay for completed care. Mark as paid when you’ve sent payment.</p>
+    <p class="text-muted small mb-0">Invoices for care completed by your caregiver.</p>
 </div>
 
 @if (session('success'))
@@ -35,10 +35,16 @@
                         <div class="min-w-0">
                             <p class="text-muted small mb-0">Invoice #{{ $invoice->invoice_number }}</p>
                             <h5 class="fw-bold mb-1 mt-0">{{ optional(optional($invoice->booking)->service)->name ?? 'Care service' }}</h5>
+                            @if(optional($invoice->booking)->service)
+                                <p class="text-muted small mb-0">
+                                    @if(optional($invoice->booking->service)->category)<span class="me-2">{{ $invoice->booking->service->category }}</span>@endif
+                                    @if(optional($invoice->booking->service)->service_type)<span class="badge bg-light text-dark">{{ ucfirst($invoice->booking->service->service_type) }}</span>@endif
+                                </p>
+                            @endif
                             <p class="text-muted small mb-0">
                                 <i class="bi bi-person me-1"></i>
                                 @if($invoice->booking && $invoice->booking->caregiver)
-                                    {{ optional($invoice->booking->caregiver->user)->name ?? 'Caregiver' }}
+                                    <a href="{{ route('patient.caregiver.show', $invoice->booking->caregiver) }}" class="text-decoration-none">{{ optional($invoice->booking->caregiver->user)->name ?? 'Caregiver' }}</a>
                                 @else
                                     —
                                 @endif
@@ -52,17 +58,12 @@
                         <span class="d-block text-muted small">Amount</span>
                         <span class="fw-bold fs-5 text-primary">Rs {{ number_format((float) $invoice->amount, 0) }}</span>
                     </div>
-                    @if($invoice->status === 'paid')
-                        <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2">
-                            <span class="badge bg-success px-3 py-2"><i class="bi bi-check-lg me-1"></i> Paid</span>
-                            <span class="text-muted small">{{ $invoice->paid_date ? $invoice->paid_date->format('d M Y') : '—' }}</span>
-                        </div>
-                        <a href="{{ route('patient.invoices.show', $invoice->id) }}" class="btn btn-outline-primary btn-sm mt-2">View details</a>
-                    @else
-                        <a href="{{ route('patient.invoices.show', $invoice->id) }}" class="btn btn-primary btn-sm mt-2">
-                            <i class="bi bi-credit-card me-1"></i> View & pay
-                        </a>
+                    @if(($invoice->status === 'paid') || (optional($invoice->booking)->payment_status === 'paid'))
+                        <span class="badge bg-success px-3 py-2 mb-2"><i class="bi bi-currency-dollar me-1"></i> Paid</span>
+                    @elseif(optional($invoice->booking)->status === 'completed')
+                        <span class="badge bg-info px-3 py-2 mb-2"><i class="bi bi-check-lg me-1"></i> Completed by caregiver</span>
                     @endif
+                    <a href="{{ route('patient.invoices.show', $invoice->id) }}" class="btn btn-outline-primary btn-sm mt-1">View details</a>
                 </div>
             </div>
         </div>
@@ -73,7 +74,7 @@
             <i class="bi bi-receipt"></i>
         </div>
         <h5 class="text-muted mb-2">No invoices yet</h5>
-        <p class="text-muted small mb-4" style="max-width: 320px; margin-left: auto; margin-right: auto;">Invoices appear here after a caregiver marks your booking as completed. You can then pay and track them here.</p>
+        <p class="text-muted small mb-4" style="max-width: 320px; margin-left: auto; margin-right: auto;">Invoices appear here after a caregiver marks your booking as completed.</p>
         <a href="{{ route('patient.bookings.index') }}" class="btn btn-outline-primary btn-sm">View my bookings</a>
     </div>
 @endforelse
@@ -86,3 +87,4 @@
     .invoice-empty-icon { width: 80px; height: 80px; border-radius: 50%; background: #f0f9ff; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #0ea5e9; opacity: 0.7; }
 </style>
 @endsection
+

@@ -41,20 +41,24 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
-        {{-- Profile Update Form --}}
-        <form action="{{ route('caregiver.profile.update') }}" method="POST" enctype="multipart/form-data">
+        {{-- Profile Update Form (POST so file uploads are always sent) --}}
+        <form action="{{ route('caregiver.profile.update.post') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            @method('PUT') {{-- Important for PUT request --}}
 
             <div class="row g-4">
-                {{-- Profile Photo --}}
+                {{-- Profile Photo – same display pattern as certificate: use path + asset('storage/...') --}}
                 <div class="col-md-4 text-center">
                     <input type="file" name="profile_photo" id="fileInput" accept="image/*" style="display: none;" />
                     <label for="fileInput" class="profile-photo-box" title="Click to change photo">
-                        <img id="profilePreview"
-                            src="{{ $caregiver->profile_photo_path ? asset('storage/' . $caregiver->profile_photo_path) : asset('Images/default-profile.png') }}"
-                            alt="Profile Photo" />
+                        @if ($caregiver->profile_photo_path)
+                            <img id="profilePreview" src="{{ asset('storage/' . $caregiver->profile_photo_path) }}" alt="Profile Photo" />
+                        @else
+                            <img id="profilePreview" src="{{ asset('Images/default-profile.png') }}" alt="Profile Photo" />
+                        @endif
                     </label>
                     <h5 class="mt-3 mb-1 fw-semibold">{{ $user->name ?? 'Your Name' }}</h5>
                     <p class="text-muted small">{{ $caregiver->caregiver_type ?? 'Caregiver' }}</p>
@@ -208,7 +212,11 @@
                                 @endfor
                             </span>
                             <span class="fw-medium ms-2">
-                                {{ optional(optional(optional($review->booking)->patient)->user)->name ?? 'Patient' }}
+                                @if($review->booking && $review->booking->patient)
+                                    <a href="{{ route('caregiver.patient.show', $review->booking->patient) }}" class="text-decoration-none">{{ optional($review->booking->patient->user)->name ?? 'Patient' }}</a>
+                                @else
+                                    {{ optional(optional(optional($review->booking)->patient)->user)->name ?? 'Patient' }}
+                                @endif
                                 @if($review->booking && $review->booking->service)
                                     <span class="text-muted small"> · {{ $review->booking->service->name }}</span>
                                 @endif

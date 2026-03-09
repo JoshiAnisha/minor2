@@ -42,6 +42,39 @@ class User extends Authenticatable
         return null;
     }
 
+    /**
+     * Whether the user has completed their profile (required before making/accepting requests).
+     * Patient: name, email, contact number, address.
+     * Caregiver: name, email, contact number, address.
+     */
+    public function isProfileComplete(): bool
+    {
+        $name = trim((string) ($this->name ?? ''));
+        $email = trim((string) ($this->email ?? ''));
+        if ($name === '' || $email === '') {
+            return false;
+        }
+        if ($this->role === 'patient') {
+            $patient = $this->patient;
+            if (!$patient) {
+                return false;
+            }
+            $contact = trim((string) ($this->contact_number ?? $patient->contact_number ?? ''));
+            $address = trim((string) ($patient->address ?? $this->getAddressAttribute() ?? ''));
+            return $contact !== '' && $address !== '';
+        }
+        if ($this->role === 'caregiver') {
+            $caregiver = $this->caregiver;
+            if (!$caregiver) {
+                return false;
+            }
+            $contact = trim((string) ($this->contact_number ?? $caregiver->contact_number ?? ''));
+            $address = trim((string) ($caregiver->address ?? ''));
+            return $contact !== '' && $address !== '';
+        }
+        return true;
+    }
+
     // Relationships
     public function patient()
     {

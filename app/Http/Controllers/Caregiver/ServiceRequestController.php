@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Caregiver;
 
 use App\Http\Controllers\Controller;
-use App\Models\CaregiverShiftTime;
 use App\Models\ServiceRequest;
 use App\Models\Bid;
 use App\Models\Booking;
@@ -17,8 +16,8 @@ use Illuminate\Support\Facades\Auth;
 class ServiceRequestController extends Controller
 {
     /**
-     * Show pending service requests that match this caregiver's schedule (shift + date).
-     * Caregiver can only accept or reject requests that match their My Schedule.
+     * Show all pending service requests to every caregiver.
+     * Caregivers see every new patient request and can accept at base price, place a bid, or decline.
      */
     public function serviceRequest()
     {
@@ -31,28 +30,13 @@ class ServiceRequestController extends Controller
             ? ServiceRequestRejection::where('caregiver_id', $caregiver->id)->pluck('service_request_id')
             : collect();
 
-        // Get this caregiver's schedule (caregiver_id in table = user id)
-        $shiftTimes = CaregiverShiftTime::where('caregiver_id', $user->id)->get();
-        $hasNoSchedule = $shiftTimes->isEmpty();
-
-        $caregiverShifts = $shiftTimes->pluck('shift')->map(fn ($s) => strtolower(trim($s)))->filter()->unique()->values()->all();
-
-        $requests = ServiceRequest::with('user', 'service')
+        $requests = ServiceRequest::with('user', 'service', 'bids')
             ->where('status', 'pending')
             ->whereNotIn('id', $rejectedIds)
             ->latest()
             ->get();
 
-        // When caregiver has no schedule, show all pending requests so they can accept/bid (and add schedule later)
-        // When they have a schedule, match by shift only (so they see all requests for their shift types)
-        if (!$hasNoSchedule) {
-            $requests = $requests->filter(function ($req) use ($caregiverShifts) {
-                $reqShift = strtolower(trim($req->shift_type ?? 'day'));
-                return in_array($reqShift, $caregiverShifts, true) || in_array('both', $caregiverShifts, true);
-            })->values();
-        }
-
-        return view('Caregiver.serviceRequest', compact('requests', 'hasNoSchedule'));
+        return view('Caregiver.serviceRequest', compact('requests'));
     }
 
     /**
@@ -65,27 +49,27 @@ class ServiceRequestController extends Controller
         if ($serviceRequest->status !== 'pending') {
             return back()->with('error', 'Request already accepted.');
         }
+        if ($serviceRequest->bids()->exists()) {
+            return back()->with('error', 'Bidding is closed for this request. Patient will choose from existing offers.');
+        }
 
         $caregiver = Auth::user()->caregiver;
         if (!$caregiver) {
             return back()->with('error', 'Caregiver profile not found.');
         }
-
-        // Get or create Patient record (bookings use patients_id = patients.id)
-        $patientUser = $serviceRequest->user;
-        if (!$patientUser) {
-            return back()->with('error', 'Patient user not found for this request.');
+        if (!Auth::user()->isProfileComplete()) {
+            return redirect()->route('caregiver.profile.edit')
+                ->with('error', 'Please complete your profile (name, email, contact number, and address) before accepting a request.');
         }
 
-        $patient = $patientUser->patient;
+        // Bookings use patients_id = patients.id; service_requests.patient_id references patients.id
+        $patient = $serviceRequest->patient;
         if (!$patient) {
-            $patient = Patient::firstOrCreate(
-                ['user_id' => $serviceRequest->patient_id],
-                ['email' => $patientUser->email]
-            );
+            return back()->with('error', 'Patient record not found for this request.');
         }
+        $patientUser = $patient->user;
 
-        $basePrice = $serviceRequest->service ? (float) $serviceRequest->service->base_price : 0;
+        $basePrice = (float) ($serviceRequest->effective_base_price ?? 0);
 
         try {
             \DB::transaction(function () use ($serviceRequest, $patient, $caregiver, $basePrice) {
@@ -94,6 +78,10 @@ class ServiceRequestController extends Controller
                 $preferredTime = $serviceRequest->preferred_time
                     ? \Carbon\Carbon::parse($serviceRequest->preferred_time)
                     : now();
+
+                [$bookingStart, $bookingEnd] = $serviceRequest->isLongTerm()
+                    ? [$serviceRequest->start_date->toDateString(), $serviceRequest->end_date->toDateString()]
+                    : [$preferredTime->toDateString(), $preferredTime->copy()->addDay()->toDateString()];
 
                 Booking::create([
                     'service_request_id' => $serviceRequest->id,
@@ -104,8 +92,8 @@ class ServiceRequestController extends Controller
                     'price'              => $basePrice,
                     'location'           => $serviceRequest->location ?? 'N/A',
                     'date_time'          => $preferredTime,
-                    'start_date'         => $preferredTime->toDateString(),
-                    'end_date'           => $preferredTime->copy()->addDay()->toDateString(),
+                    'start_date'         => $bookingStart,
+                    'end_date'           => $bookingEnd,
                     'duration_type'      => 'one-time',
                     'payment_status'     => 'pending',
                 ]);
@@ -134,19 +122,22 @@ class ServiceRequestController extends Controller
     {
         $request->validate([
             'service_request_id' => 'required|exists:service_requests,id',
-            'add_to_base'        => 'required|numeric|min:0',
+            'proposed_price'     => 'required|numeric|min:0',
         ]);
 
         $serviceRequest = ServiceRequest::with('service')->findOrFail($request->service_request_id);
-        $basePrice = (float) ($serviceRequest->service->base_price ?? 0);
-        $addToBase = (float) $request->add_to_base;
-        $proposedPrice = $basePrice + $addToBase;
+        if ($serviceRequest->bids()->exists()) {
+            return back()->with('error', 'Bidding is closed for this request. Patient will choose from existing offers.');
+        }
+        $proposedPrice = (float) $request->proposed_price;
 
-        // ✅ Get caregiver profile
         $caregiver = Auth::user()->caregiver;
-
         if (!$caregiver) {
             return back()->with('error', 'Caregiver profile not found.');
+        }
+        if (!Auth::user()->isProfileComplete()) {
+            return redirect()->route('caregiver.profile.edit')
+                ->with('error', 'Please complete your profile (name, email, contact number, and address) before placing a bid.');
         }
 
         $existingBid = Bid::where('caregivers_id', $caregiver->id)

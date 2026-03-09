@@ -51,7 +51,12 @@
                                 @foreach ($assignedServices as $as)
                                     <tr>
                                         <td>
-                                            <span class="fw-medium">{{ optional($as->patient)->name ?? 'N/A' }}</span>
+                                            @php $adminPatient = $as->patient_id ? \App\Models\Patient::where('user_id', $as->patient_id)->first() : null; @endphp
+                                            @if($adminPatient)
+                                                <a href="{{ route('admin.patients.show', $adminPatient) }}" class="text-decoration-none fw-medium">{{ optional($as->patient)->name ?? 'N/A' }}</a>
+                                            @else
+                                                <span class="fw-medium">{{ optional($as->patient)->name ?? 'N/A' }}</span>
+                                            @endif
                                         </td>
                                         <td>{{ $as->service->name ?? '-' }}</td>
                                         <td>{{ Str::limit($as->title, 40) }}</td>
@@ -66,7 +71,7 @@
                                             @elseif ($as->status === 'accepted')
                                                 <span class="badge bg-success">Accepted</span>
                                                 @if ($as->assignedCaregiver)
-                                                    <br><small class="text-muted">{{ optional($as->assignedCaregiver?->user)->name ?? '' }}</small>
+                                                    <br><small class="text-muted"><a href="{{ route('admin.caregivers.show', $as->assignedCaregiver) }}" class="text-decoration-none">{{ optional($as->assignedCaregiver->user)->name ?? '' }}</a></small>
                                                 @endif
                                             @elseif ($as->status === 'completed')
                                                 <span class="badge bg-secondary">Completed</span>

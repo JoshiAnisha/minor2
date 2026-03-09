@@ -32,8 +32,9 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
     }
 
+    /** Bookings table uses booking_id as primary key, not id. */
     public function booking()
     {
-        return $this->belongsTo(Booking::class);
+        return $this->belongsTo(Booking::class, 'booking_id', 'booking_id');
     }
 }

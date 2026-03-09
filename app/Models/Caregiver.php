@@ -16,11 +16,16 @@ class Caregiver extends Model
 
     protected $fillable = [
         'users_id',
+        'contact_number',
         'address',
         'skills',
         'field',
         'bio',
+        'qualification',
+        'experience',
+        'caregiver_type',
         'certificate_path',
+        'profile_photo_path',
         'preferred_shift',
         'available_time',
         'available_day',

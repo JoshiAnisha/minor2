@@ -35,12 +35,21 @@ class ServiceRequestController extends Controller
      */
     public function index()
     {
-        $userId = auth()->id();
+        $patient = auth()->user()->patient;
 
-        $serviceRequests = ServiceRequest::with('service', 'bids.caregiver.user', 'bookings')
-            ->where('patient_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $serviceRequests = $patient
+            ? ServiceRequest::with('service', 'bids.caregiver.user', 'bookings.caregiver.user')
+                ->where('patient_id', $patient->id)
+                ->orderBy('created_at', 'desc')
+                ->get()
+            : collect();
+
+        // Show requests that have bids from caregivers first, then the rest (each group by created_at desc)
+        if ($serviceRequests->isNotEmpty()) {
+            $withBids = $serviceRequests->filter(fn ($r) => $r->bids->isNotEmpty())->values();
+            $withoutBids = $serviceRequests->filter(fn ($r) => $r->bids->isEmpty())->values();
+            $serviceRequests = $withBids->concat($withoutBids);
+        }
 
         return view('backend.patient.service-requests.index', compact('serviceRequests'));
     }
@@ -50,8 +59,13 @@ class ServiceRequestController extends Controller
      */
     public function acceptBid(Request $request, Bid $bid)
     {
-        if (auth()->id() !== $bid->serviceRequest->patient_id) {
+        $requestOwner = $bid->serviceRequest->user;
+        if (!$requestOwner || auth()->id() !== $requestOwner->id) {
             abort(403, 'Unauthorized');
+        }
+        if (!auth()->user()->isProfileComplete()) {
+            return redirect()->route('patient.profile.edit')
+                ->with('error', 'Please complete your profile (name, email, contact number, and address) before accepting an offer.');
         }
         if ($bid->serviceRequest->status !== 'pending') {
             return back()->with('error', 'This request is no longer available.');
@@ -72,21 +86,26 @@ class ServiceRequestController extends Controller
             );
         }
 
-        $preferredTime = $bid->serviceRequest->preferred_time
-            ? \Carbon\Carbon::parse($bid->serviceRequest->preferred_time)
+        $sr = $bid->serviceRequest;
+        $preferredTime = $sr->preferred_time
+            ? \Carbon\Carbon::parse($sr->preferred_time)
             : now();
+
+        [$bookingStart, $bookingEnd] = $sr->isLongTerm()
+            ? [$sr->start_date->toDateString(), $sr->end_date->toDateString()]
+            : [$preferredTime->toDateString(), $preferredTime->copy()->addDay()->toDateString()];
 
         $booking = Booking::create([
             'service_request_id' => $bid->service_request_id,
             'patients_id'        => $patient->id,
             'caregivers_id'      => $bid->caregivers_id,
-            'services_id'        => $bid->serviceRequest->service_id,
+            'services_id'        => $sr->service_id,
             'status'             => 'accepted',
             'price'              => $bid->proposed_price,
-            'location'           => $bid->serviceRequest->location ?? 'N/A',
+            'location'           => $sr->location ?? 'N/A',
             'date_time'          => $preferredTime,
-            'start_date'         => $preferredTime->toDateString(),
-            'end_date'           => $preferredTime->copy()->addDay()->toDateString(),
+            'start_date'         => $bookingStart,
+            'end_date'           => $bookingEnd,
             'duration_type'      => 'one-time',
             'payment_status'     => 'pending',
         ]);
@@ -107,6 +126,11 @@ class ServiceRequestController extends Controller
             ->where('status', 'pending')
             ->update(['status' => 'rejected']);
 
+        $bookingId = $booking->getKey();
+        if ($bookingId) {
+            return redirect()->route('patient.bookings.show', ['id' => $bookingId])
+                ->with('success', 'Bid accepted! Booking created successfully.');
+        }
         return redirect()->route('patient.bookings.index')
             ->with('success', 'Bid accepted! Booking created successfully.');
     }
@@ -116,7 +140,8 @@ class ServiceRequestController extends Controller
      */
     public function rejectBid(Request $request, Bid $bid)
     {
-        if (auth()->id() !== $bid->serviceRequest->patient_id) {
+        $requestOwner = $bid->serviceRequest->user;
+        if (!$requestOwner || auth()->id() !== $requestOwner->id) {
             abort(403, 'Unauthorized');
         }
         if ($bid->status !== 'pending') {

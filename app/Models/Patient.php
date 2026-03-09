@@ -27,6 +27,7 @@ class Patient extends Model
     */
     protected $fillable = [
         'user_id',
+        'is_active',
         'profile_photo',
         'email',
         'date_of_birth',
@@ -58,6 +59,7 @@ class Patient extends Model
     */
     protected $casts = [
         'date_of_birth' => 'date',
+        'is_active' => 'boolean',
         'verified_status' => 'boolean',
         'rating' => 'decimal:2',
     ];
@@ -77,6 +79,7 @@ class Patient extends Model
     {
         return [
             'user_id' => $userId,
+            'is_active' => true,
             'medical_history' => '',
             'prescriptions' => '',
             'health_condition' => '',
@@ -101,7 +104,7 @@ class Patient extends Model
 
     public function serviceRequests()
     {
-        return $this->hasMany(ServiceRequest::class, 'patient_id', 'user_id');
+        return $this->hasMany(ServiceRequest::class, 'patient_id');
     }
 
     public function assignedServices()

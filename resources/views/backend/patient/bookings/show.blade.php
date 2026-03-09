@@ -22,7 +22,7 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <p class="text-muted small mb-0">Caregiver</p>
-                <p class="mb-0 fw-semibold">{{ optional($booking->caregiver->user)->name ?? '—' }}</p>
+                <p class="mb-0 fw-semibold"><a href="{{ route('patient.caregiver.show', $booking->caregiver) }}" class="text-decoration-none">{{ optional($booking->caregiver->user)->name ?? '—' }}</a></p>
             </div>
             <div class="col-md-6">
                 <p class="text-muted small mb-0">Date & time</p>
@@ -43,6 +43,17 @@
                 </span>
             </div>
         </div>
+        @if($booking->status === 'completed')
+            <hr class="my-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                @if(isset($hasReview) && $hasReview)
+                    <span class="text-muted small me-2">You reviewed this booking.</span>
+                    <a href="{{ route('patient.reviews.edit', $hasReview) }}" class="btn btn-outline-info btn-sm">Edit review</a>
+                @else
+                    <a href="{{ route('patient.bookings.review.create', $booking->getKey()) }}" class="btn btn-success btn-sm"><i class="bi bi-star me-1"></i>Leave a review</a>
+                @endif
+            </div>
+        @endif
     </div>
 </div>
 @endsection
