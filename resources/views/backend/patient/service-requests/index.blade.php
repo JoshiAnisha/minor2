@@ -31,11 +31,18 @@
                         @if($request->status === 'pending') bg-warning text-dark
                         @elseif($request->status === 'accepted') bg-success
                         @elseif($request->status === 'rejected') bg-danger
+                        @elseif($request->status === 'cancelled') bg-secondary
                         @else bg-secondary @endif" style="font-size: 0.7rem;">
                         {{ ucfirst($request->status) }}
                     </span>
                 </div>
-                <div class="text-end">
+                <div class="d-flex align-items-center gap-2">
+                    @if($request->status === 'pending')
+                        <form action="{{ route('patient.service-requests.cancel', $request) }}" method="POST" class="d-inline" onsubmit="return confirm('Cancel this request? Caregivers who have sent offers will no longer see it.');">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Cancel request</button>
+                        </form>
+                    @endif
                     <span class="fw-bold text-primary">Rs {{ number_format($request->effective_base_price ?? 0, 0) }}</span>
                 </div>
             </div>

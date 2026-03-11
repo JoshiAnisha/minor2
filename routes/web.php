@@ -103,6 +103,7 @@ Route::prefix('patient')->name('patient.')->middleware(['auth', 'role:patient', 
     // Service Requests (patient's submitted requests)
     Route::get('/service-requests', [PatientServiceRequestController::class, 'index'])->name('service-requests.index');
     Route::get('/service-requests/custom', [PatientServiceRequestController::class, 'createCustom'])->name('service-requests.create-custom');
+    Route::post('/service-requests/{service_request}/cancel', [PatientServiceRequestController::class, 'cancel'])->name('service-requests.cancel');
     Route::post('/bids/{bid}/accept', [PatientServiceRequestController::class, 'acceptBid'])->name('bids.accept');
     Route::post('/bids/{bid}/reject', [PatientServiceRequestController::class, 'rejectBid'])->name('bids.reject');
     Route::get('/caregiver/{caregiver}', [PatientCaregiverController::class, 'show'])->name('caregiver.show');

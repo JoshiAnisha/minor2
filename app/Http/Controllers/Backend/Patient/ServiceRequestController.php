@@ -44,11 +44,24 @@ class ServiceRequestController extends Controller
                 ->get()
             : collect();
 
-        // Show requests that have bids from caregivers first, then the rest (each group by created_at desc)
+        // Categorize order: 1) Pending with bids, 2) Accepted, 3) Pending (no bids), 4) Cancelled, then others
         if ($serviceRequests->isNotEmpty()) {
-            $withBids = $serviceRequests->filter(fn ($r) => $r->bids->isNotEmpty())->values();
-            $withoutBids = $serviceRequests->filter(fn ($r) => $r->bids->isEmpty())->values();
-            $serviceRequests = $withBids->concat($withoutBids);
+            $priority = function ($r) {
+                if ($r->status === 'pending' && $r->bids->isNotEmpty()) {
+                    return 1; // Bid request (has offers from caregivers)
+                }
+                if ($r->status === 'accepted') {
+                    return 2;
+                }
+                if ($r->status === 'pending') {
+                    return 3; // Pending, no bids yet
+                }
+                if ($r->status === 'cancelled') {
+                    return 4;
+                }
+                return 5; // rejected, completed, etc.
+            };
+            $serviceRequests = $serviceRequests->sortBy($priority)->values();
         }
 
         return view('backend.patient.service-requests.index', compact('serviceRequests'));
@@ -159,5 +172,26 @@ class ServiceRequestController extends Controller
         }
 
         return back()->with('success', 'Bid rejected. The caregiver has been removed from this request.');
+    }
+
+    /**
+     * Patient cancels their own service request (only when status is pending).
+     */
+    public function cancel(ServiceRequest $service_request)
+    {
+        $patient = auth()->user()->patient;
+        if (!$patient || $service_request->patient_id !== $patient->id) {
+            abort(403, 'You can only cancel your own requests.');
+        }
+        if ($service_request->status !== 'pending') {
+            return back()->with('error', 'Only pending requests can be cancelled.');
+        }
+
+        $service_request->update(['status' => 'cancelled']);
+        // Mark any pending bids as rejected so caregivers see the request is no longer open
+        $service_request->bids()->where('status', 'pending')->update(['status' => 'rejected']);
+
+        return redirect()->route('patient.service-requests.index')
+            ->with('success', 'Request cancelled successfully.');
     }
 }
