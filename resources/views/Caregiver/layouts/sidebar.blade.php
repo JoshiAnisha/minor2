@@ -1,4 +1,4 @@
-<style>
+    <style>
     .caregiver-sidebar {
         width: 260px;
         min-height: 100vh;

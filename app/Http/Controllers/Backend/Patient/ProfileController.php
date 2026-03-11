@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Backend\Patient;
 
- use App\Http\Controllers\Controller;
- use Illuminate\Http\Request;
- use Illuminate\Support\Facades\Auth;
- use Illuminate\Support\Facades\Storage;
- use App\Models\Patient;
- use App\Models\Review;
+use App\Http\Controllers\Controller;
+use App\Models\Patient;
+use App\Models\PatientHealthReport;
+use App\Models\Review;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController extends Controller
 {
@@ -19,6 +21,9 @@ class ProfileController extends Controller
         // Reviews this patient has written (about caregivers/services)
         $myReviews = Review::where('user_id', $user->id)->with('service')->latest()->take(15)->get();
 
+        if ($patient) {
+            $patient->load('healthReports');
+        }
         // Reviews given by caregivers about this patient / service (bookings where this patient was involved)
         $reviewsFromCaregivers = collect([]);
         if ($patient) {
@@ -37,8 +42,80 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $patient = $user->patient;
+        if ($patient) {
+            $patient->load('healthReports');
+        }
 
         return view('backend.patient.profile.edit', compact('user', 'patient'));
+    }
+
+    /**
+     * Store a new health report upload (patient's own profile).
+     */
+    public function storeHealthReport(Request $request)
+    {
+        $user = Auth::user();
+        $patient = $user->patient;
+        if (!$patient) {
+            return redirect()->route('patient.profile.edit')->with('error', 'Patient profile not found.');
+        }
+
+        $request->validate([
+            'health_report' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ], [
+            'health_report.required' => 'Please select a file to upload.',
+            'health_report.mimes'   => 'Allowed formats: PDF, JPG, PNG. Max size 10MB.',
+        ]);
+
+        $file = $request->file('health_report');
+        $path = $file->store('patient_health_reports', 'public');
+        $patient->healthReports()->create([
+            'file_path'      => $path,
+            'original_name' => $file->getClientOriginalName(),
+        ]);
+
+        return redirect()->route('patient.profile.edit')->with('success', 'Health report uploaded successfully.');
+    }
+
+    /**
+     * Delete a health report (patient's own).
+     */
+    public function destroyHealthReport(PatientHealthReport $healthReport)
+    {
+        $user = Auth::user();
+        $patient = $user->patient;
+        if (!$patient || $healthReport->patient_id !== $patient->id) {
+            abort(403, 'You can only delete your own health reports.');
+        }
+
+        if (Storage::disk('public')->exists($healthReport->file_path)) {
+            Storage::disk('public')->delete($healthReport->file_path);
+        }
+        $healthReport->delete();
+
+        return redirect()->back()->with('success', 'Health report removed.');
+    }
+
+    /**
+     * View a health report file inline (for display in profile). Allowed for the patient (own reports only).
+     */
+    public function viewHealthReport(PatientHealthReport $healthReport): Response
+    {
+        $user = Auth::user();
+        $patient = $user->patient;
+        if (!$patient || $healthReport->patient_id !== $patient->id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        if (!Storage::disk('public')->exists($healthReport->file_path)) {
+            abort(404, 'File not found.');
+        }
+
+        $path = Storage::disk('public')->path($healthReport->file_path);
+        return response(Storage::disk('public')->get($healthReport->file_path), 200, [
+            'Content-Type'        => mime_content_type($path),
+            'Content-Disposition' => 'inline',
+        ]);
     }
 
     public function update(Request $request)

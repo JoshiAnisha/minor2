@@ -107,9 +107,12 @@ class Patient extends Model
         return $this->hasMany(ServiceRequest::class, 'patient_id');
     }
 
-    public function assignedServices()
+    /**
+     * Patient → Health reports (uploaded documents)
+     */
+    public function healthReports()
     {
-        return $this->hasMany(AssignedService::class, 'patient_id', 'user_id');
+        return $this->hasMany(PatientHealthReport::class);
     }
 
     public function getProfilePhotoUrlAttribute()

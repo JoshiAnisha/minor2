@@ -40,7 +40,7 @@
                     <dt class="col-sm-3">Details</dt>
                     <dd class="col-sm-9">{{ $service->details ?: '—' }}</dd>
                 </dl>
-                <p class="text-muted small mt-3 mb-0">This service is visible to patients (Services) and to caregivers when assigned or requested.</p>
+                <p class="text-muted small mt-3 mb-0">This service is visible to patients (Services) and to caregivers when a patient requests it.</p>
             </div>
         </div>
     </div>

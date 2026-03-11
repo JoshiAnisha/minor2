@@ -223,9 +223,37 @@ class CaregiverBookingController extends Controller
             abort(403, 'You can only view profiles of patients you have a booking with or whose service request you can respond to.');
         }
 
-        $patient->load('user');
+        $patient->load(['user', 'healthReports']);
 
         return view('caregiver.patientProfile', compact('patient'));
+    }
+
+    /**
+     * View a patient's health report inline (caregiver with access to this patient).
+     */
+    public function viewPatientHealthReport(Patient $patient, \App\Models\PatientHealthReport $healthReport)
+    {
+        $caregiver = Auth::user()->caregiver;
+        if (!$caregiver) {
+            abort(403);
+        }
+        if ($healthReport->patient_id !== $patient->id) {
+            abort(404);
+        }
+        $hasBooking = Booking::where('caregivers_id', $caregiver->id)->where('patients_id', $patient->id)->exists();
+        $rejectedIds = \App\Models\ServiceRequestRejection::where('caregiver_id', $caregiver->id)->pluck('service_request_id');
+        $hasVisibleRequest = ServiceRequest::where('patient_id', $patient->id)->where('status', 'pending')->whereNotIn('id', $rejectedIds)->exists();
+        if (!$hasBooking && !$hasVisibleRequest) {
+            abort(403, 'You do not have access to this patient\'s health reports.');
+        }
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($healthReport->file_path)) {
+            abort(404, 'File not found.');
+        }
+        $path = \Illuminate\Support\Facades\Storage::disk('public')->path($healthReport->file_path);
+        return response(\Illuminate\Support\Facades\Storage::disk('public')->get($healthReport->file_path), 200, [
+            'Content-Type'        => mime_content_type($path),
+            'Content-Disposition' => 'inline',
+        ]);
     }
 
     // Show review form page

@@ -26,7 +26,7 @@ class ProfileController extends Controller
 
         return view('Caregiver.edit', compact('user', 'caregiver', 'reviews'));
     }
- 
+
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -58,7 +58,7 @@ class ProfileController extends Controller
             'email' => $request->email,
             'contact_number' => $request->contact_number,
         ]);
-        
+
         $user = Auth::user();
 
         $caregiver = Caregiver::where('users_id', $user->id)->first();

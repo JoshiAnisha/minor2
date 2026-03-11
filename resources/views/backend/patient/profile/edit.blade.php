@@ -33,6 +33,12 @@
         <div class="card shadow-sm p-4">
             <h3 class="text-info mb-4">Edit Patient Profile</h3>
 
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
             @if (session('error'))
                 <div class="alert alert-danger alert-dismissible fade show">
                     {{ session('error') }}
@@ -138,6 +144,52 @@
                     </div>
                 </div>
             </form>
+
+            {{-- Health reports upload & list --}}
+            @if ($patient)
+            <div class="mt-4 pt-4 border-top">
+                <h5 class="text-info mb-3"><i class="bi bi-file-earmark-medical me-2"></i>Health reports</h5>
+                <p class="text-muted small mb-3">Upload PDF or image (JPG, PNG). Max 10MB per file. These will be visible to caregivers and admin when they view your profile.</p>
+                <form action="{{ route('patient.profile.health-reports.store') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                    @csrf
+                    <div class="d-flex flex-wrap gap-2 align-items-end">
+                        <div class="flex-grow-1" style="min-width: 200px;">
+                            <input type="file" name="health_report" id="health_report" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png" required>
+                            @error('health_report')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <button type="submit" class="btn btn-info btn-sm">Upload</button>
+                    </div>
+                </form>
+                @if ($patient->healthReports && $patient->healthReports->isNotEmpty())
+                    <div class="row g-3">
+                        @foreach ($patient->healthReports as $report)
+                            @php $ext = strtolower(pathinfo($report->file_path, PATHINFO_EXTENSION)); @endphp
+                            <div class="col-12">
+                                <div class="border rounded p-3">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                        <span class="small fw-semibold text-muted">{{ $report->original_name ?: 'Health report' }}</span>
+                                        <form action="{{ route('patient.profile.health-reports.destroy', $report) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove this health report?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                        </form>
+                                    </div>
+                                    @if(in_array($ext, ['jpg', 'jpeg', 'png']))
+                                        <img src="{{ route('patient.profile.health-reports.view', $report) }}" alt="Health report" class="img-fluid rounded border" style="max-width: 100%; max-height: 400px; object-fit: contain;">
+                                    @else
+                                        <iframe src="{{ route('patient.profile.health-reports.view', $report) }}" class="w-100 rounded border" style="height: 400px;" title="{{ $report->original_name ?: 'Health report' }}"></iframe>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-muted small mb-0">No health reports uploaded yet.</p>
+                @endif
+            </div>
+            @endif
         </div>
     </div>
 

@@ -13,7 +13,6 @@ use App\Http\Controllers\Backend\Patient\ProfileController as PatientProfileCont
 use App\Http\Controllers\Backend\Patient\BookingController as PatientBookingController;
 use App\Http\Controllers\Backend\Patient\ServiceController as PatientServiceController;
 use App\Http\Controllers\Backend\Patient\ServiceRequestController as PatientServiceRequestController;
-use App\Http\Controllers\Backend\Patient\AssignedServiceController as PatientAssignedServiceController;
 use App\Http\Controllers\Backend\Patient\InvoiceController as PatientInvoiceController;
 use App\Http\Controllers\Backend\Patient\ReviewController as PatientReviewController;
 use App\Http\Controllers\Backend\Patient\CaregiverController as PatientCaregiverController;
@@ -21,17 +20,17 @@ use App\Http\Controllers\Backend\Patient\CaregiverController as PatientCaregiver
 // Caregiver Controllers
 use App\Http\Controllers\Caregiver\CaregiverController;
 use App\Http\Controllers\Caregiver\ServiceRequestController;
-use App\Http\Controllers\Caregiver\AssignedServiceController as CaregiverAssignedServiceController;
 use App\Http\Controllers\Caregiver\CaregiverBookingController;
-use App\Http\Controllers\Caregiver\ProfileController;  
+use App\Http\Controllers\Caregiver\ProfileController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\CaregiverController as AdminCaregiverController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
-use App\Http\Controllers\Admin\AppointmentController; 
+use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\FeedbackController;   
+use App\Http\Controllers\Admin\FeedbackController;
+use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 
 // Chat
 use App\Http\Controllers\ChatController;
@@ -80,6 +79,9 @@ Route::prefix('patient')->name('patient.')->middleware(['auth', 'role:patient', 
     Route::get('/profile', [PatientProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [PatientProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [PatientProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/health-reports', [PatientProfileController::class, 'storeHealthReport'])->name('profile.health-reports.store');
+    Route::delete('/profile/health-reports/{health_report}', [PatientProfileController::class, 'destroyHealthReport'])->name('profile.health-reports.destroy');
+    Route::get('/profile/health-reports/{health_report}/view', [PatientProfileController::class, 'viewHealthReport'])->name('profile.health-reports.view');
 
     // Invoices
     Route::get('/invoices', [PatientInvoiceController::class, 'index'])->name('invoices.index');
@@ -113,11 +115,6 @@ Route::prefix('patient')->name('patient.')->middleware(['auth', 'role:patient', 
     Route::get('/bookings/{id}', [PatientBookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{id}/review', [PatientReviewController::class, 'createForBooking'])->name('bookings.review.create');
     Route::post('/bookings/{id}/review', [PatientReviewController::class, 'storeForBooking'])->name('bookings.review.store');
-
-    // Assigned services (admin-assigned; patient accepts caregiver bids)
-    Route::get('/assigned-services', [PatientAssignedServiceController::class, 'index'])->name('assigned-services.index');
-    Route::post('/assigned-services/bids/{assigned_service_bid}/accept', [PatientAssignedServiceController::class, 'acceptBid'])->name('assigned-services.accept-bid');
-    Route::post('/assigned-services/bids/{assigned_service_bid}/reject', [PatientAssignedServiceController::class, 'rejectBid'])->name('assigned-services.reject-bid');
 
     // Notifications
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
@@ -163,6 +160,8 @@ Route::middleware(['auth', 'role:caregiver', 'prevent.cache'])
         // ========================
         Route::get('/patient/{patient}', [CaregiverBookingController::class, 'showPatient'])
             ->name('patient.show');
+        Route::get('/patient/{patient}/health-reports/{health_report}/view', [CaregiverBookingController::class, 'viewPatientHealthReport'])
+            ->name('patient.health-report.view');
 
         Route::get('/patient/{patient}/review', [CaregiverBookingController::class, 'createReview'])
             ->name('review.create');
@@ -184,14 +183,6 @@ Route::middleware(['auth', 'role:caregiver', 'prevent.cache'])
 
         Route::post('/service-request/bid', [ServiceRequestController::class, 'placeBid'])
             ->name('service.placeBid');
-
-        // Assigned services (admin-assigned; caregiver places bids)
-        Route::get('/assigned-services', [CaregiverAssignedServiceController::class, 'index'])
-            ->name('assigned-services.index');
-        Route::get('/assigned-services/my-bids', [CaregiverAssignedServiceController::class, 'myBids'])
-            ->name('assigned-services.my-bids');
-        Route::post('/assigned-services/place-bid', [CaregiverAssignedServiceController::class, 'placeBid'])
-            ->name('assigned-services.place-bid');
 
         // ========================
         // Profile
@@ -234,6 +225,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'preve
 
     // Manage Patients
     Route::patch('/patients/{patient}/toggle-active', [AdminPatientController::class, 'toggleActive'])->name('patients.toggle-active');
+    Route::get('/patients/{patient}/health-reports/{health_report}/view', [AdminPatientController::class, 'viewHealthReport'])->name('patients.health-report.view');
+    Route::delete('/patients/{patient}/health-reports/{health_report}', [AdminPatientController::class, 'destroyHealthReport'])->name('patients.health-report.destroy');
     Route::resource('/patients', AdminPatientController::class);
 
     // Manage Caregivers
@@ -245,6 +238,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'preve
 
     // Appointments
     Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+
+    // Invoices
+    Route::get('/invoices', [AdminInvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{id}', [AdminInvoiceController::class, 'show'])->name('invoices.show');
 
     // Feedback
     Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback');

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Patient;
+use App\Models\PatientHealthReport;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 
 class PatientController extends Controller
 {
@@ -38,8 +41,41 @@ class PatientController extends Controller
 
     public function show(Patient $patient)
     {
-        $patient->load('user');
+        $patient->load(['user', 'healthReports']);
         return view('admin.patients.show', compact('patient'));
+    }
+
+    /**
+     * Delete a patient's health report (admin only).
+     */
+    public function destroyHealthReport(Patient $patient, PatientHealthReport $healthReport)
+    {
+        if ($healthReport->patient_id !== $patient->id) {
+            abort(404);
+        }
+        if (Storage::disk('public')->exists($healthReport->file_path)) {
+            Storage::disk('public')->delete($healthReport->file_path);
+        }
+        $healthReport->delete();
+        return redirect()->route('admin.patients.show', $patient)->with('success', 'Health report removed.');
+    }
+
+    /**
+     * View a patient's health report inline (admin only).
+     */
+    public function viewHealthReport(Patient $patient, PatientHealthReport $healthReport): Response
+    {
+        if ($healthReport->patient_id !== $patient->id) {
+            abort(404);
+        }
+        if (!Storage::disk('public')->exists($healthReport->file_path)) {
+            abort(404, 'File not found.');
+        }
+        $path = Storage::disk('public')->path($healthReport->file_path);
+        return response(Storage::disk('public')->get($healthReport->file_path), 200, [
+            'Content-Type'        => mime_content_type($path),
+            'Content-Disposition' => 'inline',
+        ]);
     }
 
     public function edit(Patient $patient)

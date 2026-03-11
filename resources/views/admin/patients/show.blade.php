@@ -4,6 +4,12 @@
 
 @section('content')
 <div class="container-fluid px-0">
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Patient Profile</h2>
         <div class="d-flex gap-2">
@@ -118,10 +124,35 @@
                         <p class="text-muted small mb-1">Prescriptions</p>
                         <p class="mb-0">{{ $patient->prescriptions ?: '—' }}</p>
                     </div>
-                    <div>
+                    <div class="mb-3">
                         <p class="text-muted small mb-1">Health condition</p>
                         <p class="mb-0">{{ $patient->health_condition ?: '—' }}</p>
                     </div>
+                    @if($patient->healthReports && $patient->healthReports->isNotEmpty())
+                    <div class="pt-3 border-top">
+                        <p class="text-muted small mb-2">Health reports (uploaded by patient)</p>
+                        <div class="row g-3">
+                            @foreach($patient->healthReports as $report)
+                                @php $ext = strtolower(pathinfo($report->file_path, PATHINFO_EXTENSION)); @endphp
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                        <p class="small fw-semibold text-muted mb-0">{{ $report->original_name ?: 'Health report' }}</p>
+                                        <form action="{{ route('admin.patients.health-report.destroy', [$patient, $report]) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove this health report?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                        </form>
+                                    </div>
+                                    @if(in_array($ext, ['jpg', 'jpeg', 'png']))
+                                        <img src="{{ route('admin.patients.health-report.view', [$patient, $report]) }}" alt="Health report" class="img-fluid rounded border" style="max-width: 100%; max-height: 500px; object-fit: contain;">
+                                    @else
+                                        <iframe src="{{ route('admin.patients.health-report.view', [$patient, $report]) }}" class="w-100 rounded border" style="height: 500px;" title="{{ $report->original_name ?: 'Health report' }}"></iframe>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

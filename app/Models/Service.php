@@ -23,10 +23,5 @@ class Service extends Model
     {
         return $this->hasMany(Booking::class, 'services_id');
     }
-
-    public function assignedServices()
-    {
-        return $this->hasMany(AssignedService::class);
-    }
 }
 

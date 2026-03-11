@@ -58,6 +58,9 @@
         <a class="nav-link {{ request()->routeIs('admin.caregiver*') || request()->routeIs('admin.caregivers*') ? 'active' : '' }}" href="{{ route('admin.caregiver') }}">
             <i class="bi bi-person-badge me-2"></i> Caregivers
         </a>
+        <a class="nav-link {{ request()->routeIs('admin.invoices*') ? 'active' : '' }}" href="{{ route('admin.invoices.index') }}">
+            <i class="bi bi-receipt me-2"></i> Invoices
+        </a>
         <a class="nav-link {{ request()->routeIs('admin.feedback') ? 'active' : '' }}" href="{{ route('admin.feedback') }}">
             <i class="bi bi-chat-quote me-2"></i> Feedback
         </a>

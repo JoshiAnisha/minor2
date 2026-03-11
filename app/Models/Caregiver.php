@@ -44,9 +44,4 @@ class Caregiver extends Model
         return $this->belongsToMany(ServiceRequest::class, 'service_request_rejections', 'caregiver_id', 'service_request_id')
             ->withTimestamps();
     }
-
-    public function assignedServiceBids()
-    {
-        return $this->hasMany(AssignedServiceBid::class);
-    }
 }
