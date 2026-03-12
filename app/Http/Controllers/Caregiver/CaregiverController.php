@@ -15,7 +15,7 @@ class CaregiverController extends Controller
         $user = Auth::user();
         $caregiver = $user->caregiver;
         if (!$caregiver && $user->role === 'caregiver') {
-            $caregiver = \App\Models\Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
+            $caregiver = \App\Models\Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id, 'availability_status' => true]);
         }
         if (!$caregiver) {
             $pendingServiceRequests = ServiceRequest::with('user', 'service')

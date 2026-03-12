@@ -14,7 +14,7 @@ class CaregiverController extends Controller
         // Ensure every user with role=caregiver has a caregiver profile row (DB: caregivers.users_id -> users.id)
         User::where('role', 'caregiver')->get()->each(function (User $user) {
             if (Caregiver::where('users_id', $user->id)->doesntExist()) {
-                Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
+                Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id, 'availability_status' => true]);
             }
         });
 

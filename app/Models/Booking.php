@@ -10,9 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    /** Table uses booking_id as primary key, not id */
-    protected $primaryKey = 'booking_id';
-
     protected $fillable = [
         'service_request_id',
         'patients_id',

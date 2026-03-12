@@ -12,15 +12,21 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'service_id',
-        'bookings_id',
+        'booking_id',
         'rating',
-        'comments',
+        'comment',
     ];
 
-    /** DB column is 'comments'; alias for backward compatibility in views. */
+    /** DB column is 'comment'; alias for backward compatibility in views. */
     public function getCommentAttribute()
     {
-        return $this->attributes['comments'] ?? '';
+        return $this->attributes['comment'] ?? '';
+    }
+
+    /** Alias so views using $review->comments still work. */
+    public function getCommentsAttribute()
+    {
+        return $this->comment;
     }
 
     // Relationships
@@ -34,9 +40,9 @@ class Review extends Model
         return $this->belongsTo(Service::class);
     }
 
-    /** reviews table uses bookings_id (FK to bookings.booking_id). */
+    /** reviews.booking_id references bookings.id */
     public function booking()
     {
-        return $this->belongsTo(Booking::class, 'bookings_id', 'booking_id');
+        return $this->belongsTo(Booking::class, 'booking_id', 'id');
     }
 }

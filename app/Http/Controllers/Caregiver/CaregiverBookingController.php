@@ -19,7 +19,7 @@ class CaregiverBookingController extends Controller
         $user = Auth::user();
         $caregiver = $user->caregiver;
         if (!$caregiver && $user->role === 'caregiver') {
-            $caregiver = \App\Models\Caregiver::create(['users_id' => $user->id, 'availability_status' => true]);
+            $caregiver = \App\Models\Caregiver::create(['user_id' => $user->id, 'users_id' => $user->id, 'availability_status' => true]);
         }
         if (!$caregiver) {
             return redirect()->route('caregiver.dashboard')->with('error', 'Caregiver profile not found.');
@@ -65,15 +65,15 @@ class CaregiverBookingController extends Controller
             ->latest('updated_at')
             ->get();
 
-        // Reviews left by this caregiver for these bookings (bookings_id => Review)
+        // Reviews left by this caregiver for these bookings (booking_id => Review)
         $bookingIds = $completedBookings->isEmpty() ? [] : $completedBookings->map(fn ($b) => $b->getKey())->filter()->values()->all();
         $reviewsByBookingId = [];
         if (!empty($bookingIds)) {
             $reviews = Review::where('user_id', $user->id)
-                ->whereIn('bookings_id', $bookingIds)
+                ->whereIn('booking_id', $bookingIds)
                 ->get();
             foreach ($reviews as $r) {
-                $reviewsByBookingId[$r->bookings_id] = $r;
+                $reviewsByBookingId[$r->booking_id] = $r;
             }
         }
 
@@ -326,7 +326,7 @@ class CaregiverBookingController extends Controller
             return back()->with('error', 'No completed booking found with this patient.');
         }
 
-        if (Review::where('user_id', $caregiverUserId)->where('bookings_id', $booking->getKey())->exists()) {
+        if (Review::where('user_id', $caregiverUserId)->where('booking_id', $booking->getKey())->exists()) {
             return redirect()->route('caregiver.bookings')
                 ->with('info', 'You have already reviewed this patient for this booking.');
         }
@@ -334,9 +334,9 @@ class CaregiverBookingController extends Controller
         Review::create([
             'user_id'     => $caregiverUserId,
             'service_id'  => $booking?->services_id,
-            'bookings_id' => $booking?->getKey(),
+            'booking_id'  => $booking?->getKey(),
             'rating'      => $request->rating,
-            'comments'    => $request->comment ?? '',
+            'comment'    => $request->comment ?? '',
         ]);
 
         return redirect()->route('caregiver.bookings')

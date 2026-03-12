@@ -2,20 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Backend Controllers
-use App\Http\Controllers\Backend\HomeController;
-use App\Http\Controllers\Backend\Auth\AuthController;
-use App\Http\Controllers\Backend\NotificationsController;
+// Home & shared
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\Auth\AuthController;
 
 // Patient Controllers
-use App\Http\Controllers\Backend\Patient\DashboardController as PatientDashboardController;
-use App\Http\Controllers\Backend\Patient\ProfileController as PatientProfileController;
-use App\Http\Controllers\Backend\Patient\BookingController as PatientBookingController;
-use App\Http\Controllers\Backend\Patient\ServiceController as PatientServiceController;
-use App\Http\Controllers\Backend\Patient\ServiceRequestController as PatientServiceRequestController;
-use App\Http\Controllers\Backend\Patient\InvoiceController as PatientInvoiceController;
-use App\Http\Controllers\Backend\Patient\ReviewController as PatientReviewController;
-use App\Http\Controllers\Backend\Patient\CaregiverController as PatientCaregiverController;
+use App\Http\Controllers\Patient\DashboardController as PatientDashboardController;
+use App\Http\Controllers\Patient\ProfileController as PatientProfileController;
+use App\Http\Controllers\Patient\BookingController as PatientBookingController;
+use App\Http\Controllers\Patient\ServiceController as PatientServiceController;
+use App\Http\Controllers\Patient\ServiceRequestController as PatientServiceRequestController;
+use App\Http\Controllers\Patient\InvoiceController as PatientInvoiceController;
+use App\Http\Controllers\Patient\ReviewController as PatientReviewController;
+use App\Http\Controllers\Patient\CaregiverController as PatientCaregiverController;
 
 // Caregiver Controllers
 use App\Http\Controllers\Caregiver\CaregiverController;
