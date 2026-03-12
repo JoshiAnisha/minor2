@@ -24,7 +24,7 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('backend.auth.register.post') }}">
+        <form method="POST" action="{{ route('auth.register.post') }}">
             @csrf
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" name="name" placeholder="Full Name"
@@ -62,7 +62,7 @@
         </form>
 
         <p class="text-center mt-3 small">
-            Already have an account? <a href="{{ route('backend.auth.login') }}" class="text-info">Login</a>
+            Already have an account? <a href="{{ route('auth.login') }}" class="text-info">Login</a>
         </p>
     </div>
 @endsection

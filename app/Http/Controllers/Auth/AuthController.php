@@ -46,7 +46,7 @@ class AuthController extends Controller
             ]);
         }
 
-        return redirect()->route('backend.auth.login')->with('success', 'Registration successful! Please login.');
+        return redirect()->route('auth.login')->with('success', 'Registration successful! Please login.');
     }
 
     // Show login page
@@ -89,7 +89,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('backend.auth.login');
+        return redirect()->route('auth.login');
     }
 
     // Show forgot password
@@ -137,7 +137,7 @@ class AuthController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-            ? redirect()->route('backend.auth.login')->with('success','Password reset successfully!')
+            ? redirect()->route('auth.login')->with('success','Password reset successfully!')
             : back()->withErrors(['email'=>'Reset failed']);
     }
 }

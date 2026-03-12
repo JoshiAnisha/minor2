@@ -24,11 +24,11 @@
         <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link nav-hover text-dark fw-semibold" href="{{ route('home') }}">Home</a></li>
           <li class="nav-item"><a class="nav-link nav-hover text-dark fw-semibold" href="#services">Services</a></li>
-          <li class="nav-item"><a class="nav-link nav-hover text-dark fw-semibold" href="{{ auth()->check() ? route('patient.bookings.index') : route('backend.auth.login') }}">Book</a></li>
+          <li class="nav-item"><a class="nav-link nav-hover text-dark fw-semibold" href="{{ auth()->check() ? route('patient.bookings.index') : route('auth.login') }}">Book</a></li>
           <li class="nav-item mb-2 mb-md-0">
-            <a class="btn btn-info text-white ms-lg-3" href="{{ route('backend.auth.login') }}">Login</a>
+            <a class="btn btn-info text-white ms-lg-3" href="{{ route('auth.login') }}">Login</a>
           </li>
-                <li class="nav-item"><a class="btn btn-info text-white ms-lg-3" href="{{ route('backend.auth.register') }}">Signup</a></li>
+                <li class="nav-item"><a class="btn btn-info text-white ms-lg-3" href="{{ route('auth.register') }}">Signup</a></li>
         </ul>
       </div>
     </div>
@@ -40,7 +40,7 @@
         <div class="col-md-6 mb-4 mb-md-0">
           <h1 class="fw-bold display-5">Care Comes Home with SewaCare</h1>
           <p class="lead text-muted">Bringing professional healthcare and warm support right to your doorstep. Simple, safe, and trusted by thousands.</p>
-          <a href="{{ route('backend.auth.login') }}" class="btn btn-danger btn-lg px-4">Book a Visit</a>
+          <a href="{{ route('auth.login') }}" class="btn btn-danger btn-lg px-4">Book a Visit</a>
         </div>
         <div class="col-md-6">
           <img src="{{ asset('images/HomePage.png') }}" alt="Medical Care at Home" class="img-fluid rounded shadow">
@@ -58,7 +58,7 @@
               <img src="{{ asset('images/HomeNursing.jpeg') }}" alt="Home Nursing" class="service-img mb-3">
               <h5 class="fw-semibold">Home Nursing</h5>
               <p class="text-muted">Expert nurses for elderly, chronic care, and post-surgery recovery.</p>
-              <a href="{{ route('backend.auth.login') }}" class="btn btn-outline-info btn-sm mt-2">Book Now</a>
+              <a href="{{ route('auth.login') }}" class="btn btn-outline-info btn-sm mt-2">Book Now</a>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@
               <img src="{{ asset('images/Physiotherapy.jpeg') }}" alt="Physiotherapy" class="service-img mb-3">
               <h5 class="fw-semibold">Physiotherapy</h5>
               <p class="text-muted">Therapy sessions for mobility, recovery, and home-based exercises.</p>
-              <a href="{{ route('backend.auth.login') }}" class="btn btn-outline-info btn-sm mt-2">Book Now</a>
+              <a href="{{ route('auth.login') }}" class="btn btn-outline-info btn-sm mt-2">Book Now</a>
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@
               <img src="{{ asset('images/LabTest.jpeg') }}" alt="Lab Tests" class="service-img mb-3">
               <h5 class="fw-semibold">Lab Tests</h5>
               <p class="text-muted">Home sample collection and fast digital reports within 24 hours.</p>
-              <a href="{{ route('backend.auth.login') }}"class="btn btn-outline-info btn-sm mt-2">Book Now</a>
+              <a href="{{ route('auth.login') }}"class="btn btn-outline-info btn-sm mt-2">Book Now</a>
             </div>
           </div>
         </div>
@@ -209,8 +209,8 @@
           <ul class="list-unstyled small">
             <li><a href="{{ route('home') }}" class="text-info text-decoration-none"><i class="bi bi-house-door me-1"></i>Home</a></li>
             <li><a href="#services" class="text-info text-decoration-none"><i class="bi bi-activity me-1"></i>Services</a></li>
-            <li><a href="{{ auth()->check() ? route('patient.bookings.index') : route('backend.auth.login') }}" class="text-info text-decoration-none"><i class="bi bi-calendar-check me-1"></i>Book</a></li>
-            <li><a href="{{ route('backend.auth.login') }}" class="text-info text-decoration-none"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+            <li><a href="{{ auth()->check() ? route('patient.bookings.index') : route('auth.login') }}" class="text-info text-decoration-none"><i class="bi bi-calendar-check me-1"></i>Book</a></li>
+            <li><a href="{{ route('auth.login') }}" class="text-info text-decoration-none"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
           </ul>
         </div>
         <div class="col-md-4 mb-4">

@@ -65,7 +65,7 @@
             <i class="bi bi-chat-quote me-2"></i> Feedback
         </a>
         <hr class="my-2 mx-3 border-secondary opacity-25">
-        <form action="{{ route('backend.auth.logout') }}" method="POST" class="m-0"
+        <form action="{{ route('auth.logout') }}" method="POST" class="m-0"
             onsubmit="return confirm('Are you sure you want to logout?')">
             @csrf
             <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start" style="cursor:pointer"><i class="bi bi-box-arrow-right me-2"></i> Logout</button>

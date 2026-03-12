@@ -12,7 +12,7 @@
             <div class="alert alert-danger">{{ $errors->first() }}</div>
         @endif
 
-        <form method="POST" action="{{ route('backend.auth.password.update') }}">
+        <form method="POST" action="{{ route('auth.password.update') }}">
             @csrf
             <input type="hidden" name="token" value="{{ $token }}">
             <input type="hidden" name="email" value="{{ $email }}">
@@ -32,7 +32,7 @@
         </form>
 
         <p class="mt-3 text-center small">
-            Back to <a href="{{ route('backend.auth.login') }}" class="text-info">Login</a>
+            Back to <a href="{{ route('auth.login') }}" class="text-info">Login</a>
         </p>
     </div>
 @endsection

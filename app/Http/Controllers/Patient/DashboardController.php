@@ -15,7 +15,7 @@ class DashboardController extends Controller
     public function index()
     {
         if (!Auth::check() || !Auth::user()) {
-            return redirect()->route('backend.auth.login')
+            return redirect()->route('auth.login')
                 ->with('error', 'Please login to access the patient dashboard.');
         }
 
@@ -23,7 +23,7 @@ class DashboardController extends Controller
 
         if (!$user) {
             Auth::logout();
-            return redirect()->route('backend.auth.login')->withErrors(['error' => 'User not found.']);
+            return redirect()->route('auth.login')->withErrors(['error' => 'User not found.']);
         }
 
         if ($user->role === 'patient' && !$user->patient) {

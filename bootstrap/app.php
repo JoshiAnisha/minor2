@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectGuestsTo(fn ($request) => route('backend.auth.login'));
+        $middleware->redirectGuestsTo(fn ($request) => route('auth.login'));
         $middleware->alias([
             'prevent.cache' => \App\Http\Middleware\PreventCacheForAuthenticated::class,
             'role' => \App\Http\Middleware\EnsureRole::class,

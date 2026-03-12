@@ -15,7 +15,7 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('backend.auth.login.post') }}">
+        <form method="POST" action="{{ route('auth.login.post') }}">
             @csrf
             <div class="form-floating mb-3">
                 <input type="email" class="form-control" name="email" placeholder="Email" value="{{ old('email') }}"
@@ -29,14 +29,14 @@
             </div>
 
             <div class="text-end mb-3">
-                <a href="{{ route('backend.auth.password.request') }}" class="small text-info">Forgot Password?</a>
+                <a href="{{ route('auth.password.request') }}" class="small text-info">Forgot Password?</a>
             </div>
 
             <button type="submit" class="btn btn-info w-100 rounded-pill">Login</button>
         </form>
 
         <p class="mt-3 text-center small">
-            Don't have an account? <a href="{{ route('backend.auth.register') }}" class="text-info">Register</a>
+            Don't have an account? <a href="{{ route('auth.register') }}" class="text-info">Register</a>
         </p>
     </div>
 @endsection

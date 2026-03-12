@@ -76,7 +76,7 @@
         </li>
         <hr class="my-2 mx-2 border-secondary opacity-25">
         <li class="nav-item">
-            <form action="{{ route('backend.auth.logout') }}" method="POST" class="m-0 p-2">
+            <form action="{{ route('auth.logout') }}" method="POST" class="m-0 p-2">
                 @csrf
                 <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start" style="cursor:pointer"><i class="bi bi-box-arrow-right me-2"></i> Logout</button>
             </form>

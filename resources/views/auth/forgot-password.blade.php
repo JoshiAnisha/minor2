@@ -16,7 +16,7 @@
             <div class="alert alert-danger">{{ $errors->first() }}</div>
         @endif
 
-        <form method="POST" action="{{ route('backend.auth.password.email') }}">
+        <form method="POST" action="{{ route('auth.password.email') }}">
             @csrf
             <div class="form-floating mb-3">
                 <input type="email" class="form-control" name="email" placeholder="Email" value="{{ old('email') }}"
@@ -27,7 +27,7 @@
         </form>
 
         <p class="mt-3 text-center small">
-            Back to <a href="{{ route('backend.auth.login') }}" class="text-info">Login</a>
+            Back to <a href="{{ route('auth.login') }}" class="text-info">Login</a>
         </p>
     </div>
 @endsection

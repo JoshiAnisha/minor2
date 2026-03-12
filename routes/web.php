@@ -44,7 +44,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // ------------------------
 // Authentication Routes (rate-limited to prevent brute force)
 // ------------------------
-Route::prefix('auth')->name('backend.auth.')->group(function () {
+Route::prefix('auth')->name('auth.')->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post')

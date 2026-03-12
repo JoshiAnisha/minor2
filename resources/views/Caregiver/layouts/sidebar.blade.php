@@ -62,7 +62,7 @@
             <i class="bi bi-person-circle me-2"></i> Profile
         </a>
         <hr class="my-2 mx-3 border-secondary opacity-25">
-        <form action="{{ route('backend.auth.logout') }}" method="POST" class="m-0">
+        <form action="{{ route('auth.logout') }}" method="POST" class="m-0">
             @csrf
             <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start" style="cursor:pointer"><i class="bi bi-box-arrow-right me-2"></i> Logout</button>
         </form>
